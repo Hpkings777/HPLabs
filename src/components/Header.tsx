@@ -8,11 +8,11 @@ export function Header() {
         <Link
           href="/"
           className="flex items-center gap-2"
-          aria-label="Tool Hub Home"
+          aria-label="HP Labs Home"
         >
           <GanttChartSquare className="w-8 h-8 text-primary" />
           <span className="text-2xl font-bold font-headline text-foreground">
-            Tool Hub
+            HP Labs
           </span>
         </Link>
       </div>
