@@ -11,6 +11,7 @@ import {
   FileCog,
   GanttChartSquare,
   Home,
+  Hash,
 } from "lucide-react";
 
 import {
@@ -55,6 +56,11 @@ const tools = [
     title: "File Engineer",
     href: "/file-engineer",
     icon: <FileCog />,
+  },
+  {
+    title: "Hash Generator",
+    href: "/hash-generator",
+    icon: <Hash />,
   },
 ];
 

@@ -5,6 +5,7 @@ import {
   LockKeyhole,
   QrCode,
   FileCog,
+  Hash,
 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -39,6 +40,12 @@ const tools = [
     description: "Convert files to Base64 data URIs.",
     href: "/file-engineer",
     icon: <FileCog className="w-8 h-8" />,
+  },
+  {
+    title: "Hash Generator",
+    description: "Generate MD5, SHA-1, SHA-256, and SHA-512 hashes from text.",
+    href: "/hash-generator",
+    icon: <Hash className="w-8 h-8" />,
   },
 ];
 
