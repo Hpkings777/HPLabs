@@ -1,5 +1,3 @@
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { ToolCard } from "@/components/ToolCard";
 import {
   FileText,
@@ -8,6 +6,8 @@ import {
   QrCode,
   FileCog,
 } from "lucide-react";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 const tools = [
   {
@@ -45,7 +45,6 @@ const tools = [
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Header />
       <main className="flex-1">
         <div className="container mx-auto px-4 md:px-6 py-16">
           <section className="text-center mb-16">
