@@ -3,16 +3,16 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { GanttChartSquare } from "lucide-react";
 import {
-  FileText,
-  Fingerprint,
-  LockKeyhole,
-  QrCode,
-  FileCog,
-  GanttChartSquare,
-  Home,
-  Hash,
-} from "lucide-react";
+  mainNav,
+  bottomNav,
+  tools,
+  categories,
+  type Tool,
+  type NavLink,
+  type ToolCategory,
+} from "@/lib/tools";
 
 import {
   Sidebar,
@@ -24,48 +24,58 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
+  SidebarSeparator,
+  SidebarGroup,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 
-const tools = [
-  {
-    title: "Home",
-    href: "/",
-    icon: <Home />,
-  },
-  {
-    title: "Base64 Tool",
-    href: "/base64",
-    icon: <FileText />,
-  },
-  {
-    title: "Fake ID Generator",
-    href: "/fake-id",
-    icon: <Fingerprint />,
-  },
-  {
-    title: "Password Strength",
-    href: "/password-strength",
-    icon: <LockKeyhole />,
-  },
-  {
-    title: "QR Code Generator",
-    href: "/qr-generator",
-    icon: <QrCode />,
-  },
-  {
-    title: "File Engineer",
-    href: "/file-engineer",
-    icon: <FileCog />,
-  },
-  {
-    title: "Hash Generator",
-    href: "/hash-generator",
-    icon: <Hash />,
-  },
-];
+const NavItem = ({
+  link,
+  pathname,
+}: {
+  link: NavLink;
+  pathname: string;
+}) => (
+  <SidebarMenuItem>
+    <Link href={link.href} passHref>
+      <SidebarMenuButton
+        asChild
+        isActive={pathname === link.href}
+        tooltip={link.title}
+      >
+        <div>
+          {link.icon}
+          <span>{link.title}</span>
+        </div>
+      </SidebarMenuButton>
+    </Link>
+  </SidebarMenuItem>
+);
+
+const ToolItem = ({ tool, pathname }: { tool: Tool; pathname: string }) => (
+  <SidebarMenuItem>
+    <Link href={tool.href} passHref>
+      <SidebarMenuButton
+        asChild
+        isActive={pathname === tool.href}
+        tooltip={tool.title}
+      >
+        <div>
+          {tool.icon}
+          <span>{tool.title}</span>
+        </div>
+      </SidebarMenuButton>
+    </Link>
+  </SidebarMenuItem>
+);
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+
+  const toolsByCategory = categories.map((category) => ({
+    category,
+    tools: tools.filter((tool) => tool.category === category),
+  }));
 
   return (
     <SidebarProvider>
@@ -84,24 +94,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </span>
               </Link>
             </SidebarHeader>
-            <SidebarMenu>
-              {tools.map((tool) => (
-                <SidebarMenuItem key={tool.href}>
-                  <Link href={tool.href} passHref>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === tool.href}
-                      tooltip={tool.title}
-                    >
-                      <div>
-                        {tool.icon}
-                        <span>{tool.title}</span>
-                      </div>
-                    </SidebarMenuButton>
-                  </Link>
-                </SidebarMenuItem>
+            <SidebarMenu className="flex-1">
+              {mainNav.map((link) => (
+                <NavItem key={link.href} link={link} pathname={pathname} />
+              ))}
+              <SidebarSeparator />
+              {toolsByCategory.map(({ category, tools }) => (
+                <SidebarGroup key={category}>
+                  <SidebarGroupLabel>{category}</SidebarGroupLabel>
+                  {tools.map((tool) => (
+                    <ToolItem key={tool.href} tool={tool} pathname={pathname} />
+                  ))}
+                </SidebarGroup>
               ))}
             </SidebarMenu>
+            <SidebarSeparator />
+            <SidebarFooter>
+              <SidebarMenu>
+                {bottomNav.map((link) => (
+                  <NavItem key={link.href} link={link} pathname={pathname} />
+                ))}
+              </SidebarMenu>
+            </SidebarFooter>
           </SidebarContent>
         </Sidebar>
         <div className="flex-1">
