@@ -9,7 +9,6 @@ import {
   Cog,
   Home,
 } from "lucide-react";
-import type { ReactElement } from "react";
 
 export type ToolCategory = "Security" | "Developer" | "Utility";
 
