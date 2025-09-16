@@ -1,5 +1,6 @@
 "use client";
 
+import { useTheme } from "next-themes";
 import { ToolLayout } from "@/components/ToolLayout";
 import {
   Card,
@@ -16,13 +17,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Paintbrush } from "lucide-react";
+import { Paintbrush, Moon, Sun } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function SettingsPage() {
-  const handleThemeChange = (theme: string) => {
-    // TODO: Implement theme switching logic
-    console.log("Theme selected:", theme);
-  };
+  const { setTheme, theme } = useTheme();
 
   return (
     <ToolLayout
@@ -48,24 +47,22 @@ export default function SettingsPage() {
                 Select a theme for the dashboard.
               </p>
             </div>
-            <Select onValueChange={handleThemeChange} defaultValue="system">
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select theme" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="system" disabled>
-                  System
-                </SelectItem>
-                <SelectItem value="cyberpunk" disabled>
-                  Cyberpunk
-                </SelectItem>
-                <SelectItem value="liquid-glass" disabled>
-                  Liquid Glass
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-2">
+              <Button
+                variant={theme === "light" ? "default" : "outline"}
+                size="icon"
+                onClick={() => setTheme("light")}
+              >
+                <Sun className="h-5 w-5" />
+              </Button>
+              <Button
+                variant={theme === "dark" ? "default" : "outline"}
+                size="icon"
+                onClick={() => setTheme("dark")}
+              >
+                <Moon className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
