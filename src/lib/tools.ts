@@ -8,6 +8,7 @@ import {
   Hash,
   Cog,
   Home,
+  User,
 } from "lucide-react";
 
 export type ToolCategory = "Security" | "Developer" | "Utility";
