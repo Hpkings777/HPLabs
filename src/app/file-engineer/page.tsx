@@ -5,7 +5,7 @@ import { ToolLayout } from "@/components/ToolLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Clipboard, Check } from "lucide-react";
+import { Upload, Clipboard, Check, Trash2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
 export default function FileEngineer() {
@@ -17,6 +17,14 @@ export default function FileEngineer() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
+      if (selectedFile.size > 10 * 1024 * 1024) { // 10MB limit
+        toast({
+          title: "File Too Large",
+          description: "Please select a file smaller than 10MB.",
+          variant: "destructive",
+        });
+        return;
+      }
       setFile(selectedFile);
       const reader = new FileReader();
       reader.onload = (loadEvent) => {
@@ -63,10 +71,10 @@ export default function FileEngineer() {
     >
       <Card>
         <CardContent className="p-6 space-y-6">
-          <div className="space-y-2">
-            <label
+          {!base64 ? (
+             <label
               htmlFor="file-upload"
-              className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/80 transition-colors"
+              className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/80 transition-colors"
             >
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <Upload className="w-10 h-10 mb-3 text-muted-foreground" />
@@ -85,42 +93,44 @@ export default function FileEngineer() {
                 onChange={handleFileChange}
               />
             </label>
-            {file && (
-              <p className="text-sm text-center text-muted-foreground pt-2">
-                Selected file: <span className="font-medium">{file.name}</span> ({Math.round(file.size / 1024)} KB)
-              </p>
-            )}
-          </div>
-
-          {base64 && (
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <label className="text-sm font-medium">Base64 Data URI</label>
-                <Button variant="ghost" size="sm" onClick={handleCopyToClipboard}>
-                  {isCopied ? (
-                    <Check className="w-4 h-4 mr-2 text-green-500" />
-                  ) : (
-                    <Clipboard className="w-4 h-4 mr-2" />
-                  )}
-                  {isCopied ? "Copied" : "Copy"}
-                </Button>
+          ) : (
+            <div className="space-y-4">
+               {file && (
+                <div className="text-sm text-center text-muted-foreground pt-2">
+                  <p>Selected file: <span className="font-medium text-foreground">{file.name}</span></p>
+                  <p>Size: <span className="font-medium text-foreground">{Math.round(file.size / 1024)} KB</span></p>
+                </div>
+              )}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-medium">Base64 Data URI</label>
+                  <Button variant="ghost" size="sm" onClick={handleCopyToClipboard}>
+                    {isCopied ? (
+                      <Check className="w-4 h-4 mr-2 text-green-500" />
+                    ) : (
+                      <Clipboard className="w-4 h-4 mr-2" />
+                    )}
+                    {isCopied ? "Copied" : "Copy"}
+                  </Button>
+                </div>
+                <Textarea
+                  value={base64}
+                  readOnly
+                  className="min-h-[200px] font-code bg-muted/50"
+                  placeholder="Base64 output will appear here"
+                />
               </div>
-              <Textarea
-                value={base64}
-                readOnly
-                className="min-h-[150px] font-code bg-muted"
-                placeholder="Base64 output will appear here"
-              />
+              <div className="flex justify-center pt-2">
+                <Button
+                  variant="outline"
+                  onClick={clearAll}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Clear and Start Over
+                </Button>
+            </div>
             </div>
           )}
-           <div className="flex justify-end mt-4">
-              <Button
-                variant="outline"
-                onClick={clearAll}
-              >
-                Clear
-              </Button>
-          </div>
         </CardContent>
       </Card>
     </ToolLayout>

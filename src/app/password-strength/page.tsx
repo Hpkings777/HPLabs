@@ -1,15 +1,12 @@
 "use client";
 
-import { useState, useMemo, useTransition } from "react";
+import { useState, useMemo } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { CheckCircle, XCircle, Sparkles, Loader } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { suggestPassword } from "@/ai/flows/password-suggestion-flow";
+import { CheckCircle, XCircle } from "lucide-react";
 
 function Criteria({ check, text }: { check: boolean; text: string }) {
   return (
@@ -19,19 +16,17 @@ function Criteria({ check, text }: { check: boolean; text: string }) {
       }`}
     >
       {check ? (
-        <CheckCircle className="w-4 h-4 text-chart-2" />
+        <CheckCircle className="w-4 h-4 text-green-500" />
       ) : (
-        <XCircle className="w-4 h-4" />
+        <XCircle className="w-4 h-4 text-muted-foreground" />
       )}
-      <span>{text}</span>
+      <span className="text-sm">{text}</span>
     </div>
   );
 }
 
 export default function PasswordStrengthChecker() {
   const [password, setPassword] = useState("");
-  const [isPending, startTransition] = useTransition();
-  const { toast } = useToast();
 
   const { strength, strengthText, progressColor } = useMemo(() => {
     if (!password) {
@@ -76,83 +71,43 @@ export default function PasswordStrengthChecker() {
     symbol: /[^A-Za-z0-9]/.test(password),
   };
 
-  const handleSuggestPassword = () => {
-    if (password.length > 0 && strength < 5) {
-      startTransition(async () => {
-        try {
-          const result = await suggestPassword({ currentPassword: password });
-          setPassword(result.suggestion);
-          toast({
-            title: "Password Suggestion",
-            description: "Here is a stronger password suggestion.",
-          });
-        } catch (e) {
-          toast({
-            title: "Error",
-            description: "Could not generate a password suggestion.",
-            variant: "destructive",
-          });
-        }
-      });
-    } else if (strength >= 5) {
-        toast({
-            title: "Already Strong!",
-            description: "Your current password is secure enough.",
-        });
-    } else {
-      toast({
-        title: "Input needed",
-        description: "Please enter a password first.",
-        variant: "destructive",
-      })
-    }
-  };
-
   return (
     <ToolLayout
       title="Password Strength Checker"
       description="Analyze the strength of your password to ensure your accounts are secure."
     >
       <Card>
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password-input">Enter Password</Label>
-              <Input
-                id="password-input"
-                type="text"
-                placeholder="Type a password..."
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="font-code"
-              />
-            </div>
+        <CardHeader>
+           <CardTitle>Password Analyzer</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="password-input">Enter Password</Label>
+            <Input
+              id="password-input"
+              type="text"
+              placeholder="Type a password..."
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="font-code text-lg"
+            />
+          </div>
 
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">Strength</span>
-                <span className="text-sm font-bold">{strengthText}</span>
-              </div>
-              <Progress value={(strength / 6) * 100} className={`h-2 [&>div]:${progressColor}`} />
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium text-muted-foreground">Strength</span>
+              <span className="text-sm font-bold">{strengthText}</span>
             </div>
+            <Progress value={(strength / 6) * 100} className={`h-2 [&>div]:${progressColor}`} />
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm pt-4">
-              <Criteria check={checks.length} text="At least 8 characters" />
-              <Criteria check={checks.uppercase} text="Contains an uppercase letter" />
-              <Criteria check={checks.lowercase} text="Contains a lowercase letter" />
-              <Criteria check={checks.number} text="Contains a number" />
-              <Criteria check={checks.symbol} text="Contains a symbol" />
-            </div>
-             <div className="pt-4">
-              <Button onClick={handleSuggestPassword} disabled={isPending} className="w-full">
-                {isPending ? (
-                  <Loader className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Sparkles className="mr-2 h-4 w-4" />
-                )}
-                {isPending ? "Generating..." : "Suggest a Stronger Password"}
-              </Button>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 pt-4 border-t">
+             <h3 className="sm:col-span-2 text-md font-semibold mb-2">Security Checklist</h3>
+            <Criteria check={checks.length} text="At least 8 characters" />
+            <Criteria check={checks.uppercase} text="Contains an uppercase letter" />
+            <Criteria check={checks.lowercase} text="Contains a lowercase letter" />
+            <Criteria check={checks.number} text="Contains a number" />
+            <Criteria check={checks.symbol} text="Contains a symbol" />
           </div>
         </CardContent>
       </Card>
