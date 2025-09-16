@@ -17,7 +17,7 @@ export interface Tool {
   title: string;
   description: string;
   href: string;
-  icon: ReactElement<any, any>;
+  icon: LucideIcon;
   category: ToolCategory;
 }
 
@@ -26,42 +26,42 @@ export const tools: Tool[] = [
     title: "Base64 Tool",
     description: "Encode and decode data between plain text and Base64.",
     href: "/base64",
-    icon: <FileText className="w-8 h-8" />,
+    icon: FileText,
     category: "Developer",
   },
   {
     title: "Fake ID Generator",
     description: "Generate random user data for development and testing.",
     href: "/fake-id",
-    icon: <Fingerprint className="w-8 h-8" />,
+    icon: Fingerprint,
     category: "Utility",
   },
   {
     title: "Password Strength",
     description: "Check the strength of your password to enhance security.",
     href: "/password-strength",
-    icon: <LockKeyhole className="w-8 h-8" />,
+    icon: LockKeyhole,
     category: "Security",
   },
   {
     title: "QR Code Generator",
     description: "Instantly create QR codes from text or URLs for easy sharing.",
     href: "/qr-generator",
-    icon: <QrCode className="w-8 h-8" />,
+    icon: QrCode,
     category: "Utility",
   },
   {
     title: "File Engineer",
     description: "Convert files to Base64 data URIs.",
     href: "/file-engineer",
-    icon: <FileCog className="w-8 h-8" />,
+    icon: FileCog,
     category: "Developer",
   },
   {
     title: "Hash Generator",
     description: "Generate MD5, SHA-1, SHA-256, and SHA-512 hashes from text.",
     href: "/hash-generator",
-    icon: <Hash className="w-8 h-8" />,
+    icon: Hash,
     category: "Security",
   },
 ];
@@ -69,7 +69,7 @@ export const tools: Tool[] = [
 export interface NavLink {
   title: string;
   href: string;
-  icon: ReactElement<any, any>;
+  icon: LucideIcon;
   isTool?: boolean;
 }
 
@@ -77,7 +77,7 @@ export const mainNav: NavLink[] = [
   {
     title: "Home",
     href: "/",
-    icon: <Home />,
+    icon: Home,
     isTool: false,
   },
 ];
@@ -86,7 +86,7 @@ export const bottomNav: NavLink[] = [
     {
         title: "Settings",
         href: "/settings",
-        icon: <Cog />,
+        icon: Cog,
         isTool: false,
     }
 ]

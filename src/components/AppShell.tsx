@@ -35,39 +35,45 @@ const NavItem = ({
 }: {
   link: NavLink;
   pathname: string;
-}) => (
-  <SidebarMenuItem>
-    <Link href={link.href} passHref>
-      <SidebarMenuButton
-        asChild
-        isActive={pathname === link.href}
-        tooltip={link.title}
-      >
-        <div>
-          {link.icon}
-          <span>{link.title}</span>
-        </div>
-      </SidebarMenuButton>
-    </Link>
-  </SidebarMenuItem>
-);
+}) => {
+  const Icon = link.icon;
+  return (
+    <SidebarMenuItem>
+      <Link href={link.href} passHref>
+        <SidebarMenuButton
+          asChild
+          isActive={pathname === link.href}
+          tooltip={link.title}
+        >
+          <div>
+            <Icon />
+            <span>{link.title}</span>
+          </div>
+        </SidebarMenuButton>
+      </Link>
+    </SidebarMenuItem>
+  );
+};
 
-const ToolItem = ({ tool, pathname }: { tool: Tool; pathname: string }) => (
-  <SidebarMenuItem>
-    <Link href={tool.href} passHref>
-      <SidebarMenuButton
-        asChild
-        isActive={pathname === tool.href}
-        tooltip={tool.title}
-      >
-        <div>
-          {tool.icon}
-          <span>{tool.title}</span>
-        </div>
-      </SidebarMenuButton>
-    </Link>
-  </SidebarMenuItem>
-);
+const ToolItem = ({ tool, pathname }: { tool: Tool; pathname: string }) => {
+  const Icon = tool.icon;
+  return (
+    <SidebarMenuItem>
+      <Link href={tool.href} passHref>
+        <SidebarMenuButton
+          asChild
+          isActive={pathname === tool.href}
+          tooltip={tool.title}
+        >
+          <div>
+            <Icon />
+            <span>{tool.title}</span>
+          </div>
+        </SidebarMenuButton>
+      </Link>
+    </SidebarMenuItem>
+  )
+};
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
