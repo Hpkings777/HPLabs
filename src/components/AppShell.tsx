@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GanttChartSquare, User } from "lucide-react";
+import { GanttChartSquare, User, Sparkles } from "lucide-react";
 import {
   mainNav,
   bottomNav,
@@ -40,13 +40,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
 import { LoadingSpinner } from "./ui/loading-spinner";
+import { Badge } from "./ui/badge";
 
 const NavItem = ({
   link,
   pathname,
 }: {
   link: NavLink;
-  pathname: string;
+  pathname:string;
 }) => {
   const Icon = link.icon;
   return (
@@ -118,9 +119,12 @@ function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">
-              {user.displayName ?? 'Anonymous'}
-            </p>
+            <div className="flex items-center justify-between">
+               <p className="text-sm font-medium leading-none">
+                {user.displayName ?? 'Anonymous'}
+              </p>
+              {user.isPremium && <Badge variant="secondary" className="bg-accent/20 text-accent-foreground border-none"><Sparkles className="w-3 h-3 mr-1 text-accent" /> Premium</Badge>}
+            </div>
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
@@ -138,12 +142,21 @@ function UserNav() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { authLoading } = useAuth();
-
+  const { user, loading, authLoading } = useAuth();
+  
   const toolsByCategory = categories.map((category) => ({
     category,
-    tools: tools.filter((tool) => tool.category === category),
-  }));
+    tools: tools.filter((tool) => {
+      if (tool.isPremium) {
+        return user?.isPremium;
+      }
+      return tool.category === category;
+    }),
+  })).filter(c => c.tools.length > 0);
+
+  if (loading) {
+    return <LoadingSpinner isFullScreen />;
+  }
 
   return (
     <SidebarProvider>

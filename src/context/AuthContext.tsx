@@ -14,32 +14,74 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
-  type User,
+  type User as FirebaseAuthUser,
 } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { useRouter } from "next/navigation";
+import { auth, db } from "@/lib/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+
+export interface UserProfile {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  isPremium: boolean;
+}
 
 interface AuthContextType {
-  user: User | null;
+  user: UserProfile | null;
+  firebaseUser: FirebaseAuthUser | null;
   loading: boolean;
   authLoading: boolean;
   login: typeof signInWithEmailAndPassword;
   signup: typeof createUserWithEmailAndPassword;
   logout: () => void;
-  signInWithGoogle: () => void;
+  signInWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const createUserProfileDocument = async (user: FirebaseAuthUser) => {
+  const userDocRef = doc(db, "users", user.uid);
+  const userSnapshot = await getDoc(userDocRef);
+
+  if (!userSnapshot.exists()) {
+    const { uid, email, displayName, photoURL } = user;
+    try {
+      await setDoc(userDocRef, {
+        uid,
+        email,
+        displayName,
+        photoURL,
+        isPremium: false, // Default to false for new users
+        createdAt: new Date(),
+      });
+    } catch (error) {
+      console.error("Error creating user profile document:", error);
+    }
+  }
+  return userDocRef;
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseAuthUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [authLoading, setAuthLoading] = useState(false);
-  const router = useRouter();
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      if (fbUser) {
+        setFirebaseUser(fbUser);
+        await createUserProfileDocument(fbUser);
+        const userDocRef = doc(db, "users", fbUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          setUser(userDoc.data() as UserProfile);
+        }
+      } else {
+        setFirebaseUser(null);
+        setUser(null);
+      }
       setLoading(false);
       setAuthLoading(false);
     });
@@ -49,11 +91,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     setAuthLoading(true);
-    setUser(null);
     await signOut(auth);
-    router.push("/login");
-    setAuthLoading(false);
+    setUser(null);
+    setFirebaseUser(null);
+    // No need to push here, handled by pages
   };
+
+  const signup = async (...args: Parameters<typeof createUserWithEmailAndPassword>) => {
+    setAuthLoading(true);
+    const userCredential = await createUserWithEmailAndPassword(...args);
+    // onAuthStateChanged will handle the rest
+    return userCredential;
+  }
+
+  const login = async (...args: Parameters<typeof signInWithEmailAndPassword>) => {
+    setAuthLoading(true);
+    const userCredential = await signInWithEmailAndPassword(...args);
+    // onAuthStateChanged will handle the rest
+    return userCredential;
+  }
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
@@ -63,24 +119,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // onAuthStateChanged will handle setting the user and redirecting.
     } catch (error: any) {
       console.error("Error signing in with Google", error);
-      setAuthLoading(false);
-      // Optionally show a toast message here
+      setAuthLoading(false); // Only set to false on error, success is handled by listener
     }
   };
 
-  const value = {
+  const value: AuthContextType = {
     user,
+    firebaseUser,
     loading,
     authLoading,
-    login: signInWithEmailAndPassword,
-    signup: createUserWithEmailAndPassword,
+    login,
+    signup,
     logout,
     signInWithGoogle,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }

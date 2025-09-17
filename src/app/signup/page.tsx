@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,7 +17,6 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { GanttChartSquare } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -54,7 +52,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const { user, signup, signInWithGoogle, authLoading }_ = useAuth();
+  const { user, signup, signInWithGoogle, authLoading } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -66,10 +64,18 @@ export default function SignupPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if(password.length < 6) {
+        toast({
+            title: "Password Too Short",
+            description: "Password must be at least 6 characters.",
+            variant: "destructive",
+        });
+        return;
+    }
     setIsLoading(true);
     try {
       await signup(auth, email, password);
-      // The useEffect above will handle the redirect
+      // The onAuthStateChanged listener will handle the redirect
     } catch (error: any) {
       toast({
         title: "Sign Up Failed",
@@ -85,18 +91,23 @@ export default function SignupPage() {
     setIsGoogleLoading(true);
     try {
         await signInWithGoogle();
-        // The useEffect above will handle the redirect
+        // The onAuthStateChanged listener will handle the redirect
     } catch (error: any) {
         toast({
             title: "Sign-in Failed",
             description: error.message,
             variant: "destructive",
         });
+    } finally {
         setIsGoogleLoading(false);
     }
   }
 
   const anyLoading = isLoading || isGoogleLoading || authLoading;
+
+  if (authLoading && !anyLoading) {
+    return <LoadingSpinner isFullScreen />;
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
@@ -157,7 +168,7 @@ export default function SignupPage() {
               </div>
             </div>
              <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={anyLoading}>
-                {isGoogleLoading || authLoading ? <LoadingSpinner /> : <><GoogleIcon className="mr-2 h-5 w-5" /> Google</>}
+                {isGoogleLoading ? <LoadingSpinner /> : <><GoogleIcon className="mr-2 h-5 w-5" /> Google</>}
             </Button>
             <div className="mt-6 text-center text-sm">
               Already have an account?{" "}

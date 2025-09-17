@@ -7,12 +7,17 @@ import { ToolCard } from "@/components/ToolCard";
 import { Input } from "@/components/ui/input";
 import { tools, categories, type Tool, type ToolCategory } from "@/lib/tools";
 import { Search } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebounce(search, 300);
+  const { user } = useAuth();
 
-  const filteredTools = tools.filter(
+  const availableTools = tools.filter(tool => !tool.isPremium || (tool.isPremium && user?.isPremium));
+
+  const filteredTools = availableTools.filter(
     (tool) =>
       tool.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
       tool.description.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
@@ -22,7 +27,7 @@ export default function Home() {
   const toolsByCategory = categories.map((category) => ({
     category,
     tools: filteredTools.filter((tool) => tool.category === category),
-  }));
+  })).filter(c => c.tools.length > 0);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -55,8 +60,9 @@ export default function Home() {
             ({ category, tools: categoryTools }) =>
               categoryTools.length > 0 && (
                 <section key={category} className="mb-12">
-                  <h2 className="text-2xl font-headline font-semibold mb-6">
+                  <h2 className="text-2xl font-headline font-semibold mb-6 flex items-center gap-4">
                     {category} Tools
+                    {category === 'Premium' && <Badge className="bg-accent text-accent-foreground">Premium</Badge>}
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {categoryTools.map((tool) => (

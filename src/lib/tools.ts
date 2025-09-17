@@ -9,9 +9,10 @@ import {
   Cog,
   Home,
   User,
+  Wand2,
 } from "lucide-react";
 
-export type ToolCategory = "Security" | "Developer" | "Utility";
+export type ToolCategory = "Security" | "Developer" | "Utility" | "Premium";
 
 export interface Tool {
   title: string;
@@ -19,6 +20,7 @@ export interface Tool {
   href: string;
   icon: LucideIcon;
   category: ToolCategory;
+  isPremium?: boolean;
 }
 
 export const tools: Tool[] = [
@@ -64,6 +66,14 @@ export const tools: Tool[] = [
     icon: Hash,
     category: "Security",
   },
+  {
+    title: "AI Image Enhancer",
+    description: "Use AI to upscale and enhance your images. (Premium)",
+    href: "/ai-image-enhancer",
+    icon: Wand2,
+    category: "Premium",
+    isPremium: true,
+  }
 ];
 
 export interface NavLink {
@@ -91,4 +101,4 @@ export const bottomNav: NavLink[] = [
     }
 ]
 
-export const categories: ToolCategory[] = ["Developer", "Security", "Utility"];
+export const categories: ToolCategory[] = ["Developer", "Security", "Utility", "Premium"];

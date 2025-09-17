@@ -68,7 +68,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await login(auth, email, password);
-      // The useEffect above will handle the redirect
+      // The onAuthStateChanged listener will handle the redirect
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -84,18 +84,23 @@ export default function LoginPage() {
     setIsGoogleLoading(true);
     try {
         await signInWithGoogle();
-        // The useEffect above will handle the redirect
+        // The onAuthStateChanged listener will handle the redirect
     } catch (error: any) {
         toast({
             title: "Sign-in Failed",
             description: error.message,
             variant: "destructive",
         });
+    } finally {
         setIsGoogleLoading(false);
     }
   }
   
   const anyLoading = isLoading || isGoogleLoading || authLoading;
+
+  if (authLoading && !anyLoading) {
+    return <LoadingSpinner isFullScreen />;
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
@@ -155,7 +160,7 @@ export default function LoginPage() {
               </div>
             </div>
             <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={anyLoading}>
-                {isGoogleLoading || authLoading ? <LoadingSpinner /> : <><GoogleIcon className="mr-2 h-5 w-5" /> Google</>}
+                {isGoogleLoading ? <LoadingSpinner /> : <><GoogleIcon className="mr-2 h-5 w-5" /> Google</>}
             </Button>
 
             <div className="mt-6 text-center text-sm">
