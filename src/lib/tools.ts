@@ -10,6 +10,7 @@ import {
   Home,
   User,
   Wand2,
+  Link,
 } from "lucide-react";
 
 export type ToolCategory = "Security" | "Developer" | "Utility" | "Premium";
@@ -30,6 +31,13 @@ export const tools: Tool[] = [
     href: "/base64",
     icon: FileText,
     category: "Developer",
+  },
+  {
+    title: "URL Shortener",
+    description: "Create short, shareable links from long URLs.",
+    href: "/url-shortener",
+    icon: Link,
+    category: "Utility",
   },
   {
     title: "Fake ID Generator",

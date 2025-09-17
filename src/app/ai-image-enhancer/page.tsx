@@ -15,29 +15,37 @@ export default function AiImageEnhancerPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user?.isPremium) {
-      // Maybe redirect to an upgrade page in the future
-      router.push("/");
+    if (!loading && !user) {
+      router.push("/login");
     }
   }, [user, loading, router]);
 
-  if (loading || !user?.isPremium) {
+  if (loading || !user) {
     return (
       <ToolLayout
         title="AI Image Enhancer"
         description="This is a premium feature."
       >
         <div className="flex flex-col items-center justify-center text-center py-12">
-            {loading ? <LoadingSpinner /> : (
-                <>
-                    <Lock className="w-16 h-16 text-muted-foreground mb-4" />
-                    <h2 className="text-2xl font-semibold mb-2">Access Denied</h2>
-                    <p className="text-muted-foreground mb-6">You must be a premium user to access this tool.</p>
-                    <Button asChild>
-                        <Link href="/">Back to Home</Link>
-                    </Button>
-                </>
-            )}
+           <LoadingSpinner /> 
+        </div>
+      </ToolLayout>
+    );
+  }
+
+  if (!user.isPremium) {
+     return (
+      <ToolLayout
+        title="AI Image Enhancer"
+        description="This is a premium feature."
+      >
+        <div className="flex flex-col items-center justify-center text-center py-12">
+            <Lock className="w-16 h-16 text-muted-foreground mb-4" />
+            <h2 className="text-2xl font-semibold mb-2">Access Denied</h2>
+            <p className="text-muted-foreground mb-6">This tool is available for premium users only.</p>
+            <Button asChild>
+                <Link href="/">Back to Home</Link>
+            </Button>
         </div>
       </ToolLayout>
     );

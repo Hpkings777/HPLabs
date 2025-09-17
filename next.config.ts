@@ -38,7 +38,16 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
     NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-  }
+  },
+  async redirects() {
+    return [
+      {
+        source: '/:shortId',
+        destination: '/api/redirect/:shortId',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
