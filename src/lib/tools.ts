@@ -26,6 +26,14 @@ export interface Tool {
 
 export const tools: Tool[] = [
   {
+    title: "HP AI",
+    description: "Use AI to upscale and enhance your images. (Premium)",
+    href: "/hp-ai",
+    icon: Wand2,
+    category: "Premium",
+    isPremium: true,
+  },
+  {
     title: "Base64 Tool",
     description: "Encode and decode data between plain text and Base64.",
     href: "/base64",
@@ -74,14 +82,6 @@ export const tools: Tool[] = [
     icon: Hash,
     category: "Security",
   },
-  {
-    title: "AI Image Enhancer",
-    description: "Use AI to upscale and enhance your images. (Premium)",
-    href: "/ai-image-enhancer",
-    icon: Wand2,
-    category: "Premium",
-    isPremium: true,
-  }
 ];
 
 export interface NavLink {

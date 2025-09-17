@@ -1,28 +1,28 @@
+
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { Lock, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
-export default function AiImageEnhancerPage() {
+export default function HPAIPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/login?redirect=/ai-image-enhancer");
+      router.push("/login?redirect=/hp-ai");
     }
   }, [user, loading, router]);
 
   if (loading || !user) {
     return (
       <ToolLayout
-        title="AI Image Enhancer"
+        title="HP AI"
         description="This is a premium feature."
       >
         <div className="flex flex-col items-center justify-center text-center py-12">
@@ -35,8 +35,8 @@ export default function AiImageEnhancerPage() {
   if (!user.isPremium) {
      return (
       <ToolLayout
-        title="AI Image Enhancer"
-        description="Unlock the power of AI to enhance your images."
+        title="HP AI"
+        description="Unlock the power of HP AI to enhance your images."
       >
         <div className="flex flex-col items-center justify-center text-center py-12 bg-card border rounded-lg shadow-lg">
             <div className="p-6 bg-yellow-400/10 rounded-full mb-6">
@@ -56,7 +56,7 @@ export default function AiImageEnhancerPage() {
 
   return (
     <ToolLayout
-      title="AI Image Enhancer"
+      title="HP AI"
       description="Use AI to upscale and enhance your images."
     >
         <div className="flex flex-col items-center justify-center text-center py-12 bg-card border rounded-lg shadow-lg">
