@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
+import { LoadingSpinner } from "./ui/loading-spinner";
 
 const NavItem = ({
   link,
@@ -137,14 +138,22 @@ function UserNav() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { authLoading, user } = useAuth();
 
   const toolsByCategory = categories.map((category) => ({
     category,
     tools: tools.filter((tool) => tool.category === category),
   }));
+  
+  React.useEffect(() => {
+    if (user && (pathname === '/login' || pathname === '/signup')) {
+      window.location.href = '/';
+    }
+  }, [user, pathname]);
 
   return (
     <SidebarProvider>
+      {authLoading && <LoadingSpinner isFullScreen />}
       <div className="flex min-h-screen">
         <Sidebar>
           <SidebarContent>

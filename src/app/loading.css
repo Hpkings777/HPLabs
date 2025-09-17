@@ -1,0 +1,105 @@
+
+@keyframes pulse-wave {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes rotate-ring {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  color: white;
+}
+
+.loading-spinner-container {
+  position: relative;
+  width: 250px;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulse-wave {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #6c56f7;
+  border-radius: 50%;
+  animation: pulse-wave 2.5s infinite ease-out;
+  opacity: 0;
+}
+
+.pulse-wave:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.pulse-wave:nth-child(3) {
+  animation-delay: 1s;
+}
+
+.ring-particle {
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: #00e5ff;
+  animation: rotate-ring 3s linear infinite;
+}
+
+.ring-particle::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  background-color: #00e5ff;
+  border-radius: 50%;
+  box-shadow: 0 0 5px #00e5ff, 0 0 10px #00e5ff, 0 0 15px #00e5ff;
+}
+
+.loading-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 
+    0 0 5px #fff,
+    0 0 10px #00e5ff,
+    0 0 20px #00e5ff,
+    0 0 30px #6c56f7,
+    0 0 40px #6c56f7;
+}
+
+.compact-spinner {
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: rotate-ring 0.8s linear infinite;
+}

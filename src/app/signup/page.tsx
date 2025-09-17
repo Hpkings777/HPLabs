@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { GanttChartSquare } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -51,7 +53,8 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { user, signup, signInWithGoogle } = useAuth();
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const { user, signup, signInWithGoogle, authLoading } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -79,6 +82,7 @@ export default function SignupPage() {
   };
 
   const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true);
     try {
         await signInWithGoogle();
     } catch (error: any) {
@@ -87,8 +91,11 @@ export default function SignupPage() {
             description: error.message,
             variant: "destructive",
         });
+        setIsGoogleLoading(false);
     }
   }
+
+  const anyLoading = isLoading || isGoogleLoading || authLoading;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
@@ -119,6 +126,7 @@ export default function SignupPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={anyLoading}
                 />
               </div>
               <div className="space-y-2">
@@ -130,10 +138,11 @@ export default function SignupPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   minLength={6}
+                  disabled={anyLoading}
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating Account..." : "Create Account"}
+              <Button type="submit" className="w-full" disabled={anyLoading}>
+                {isLoading ? <LoadingSpinner /> : "Create Account"}
               </Button>
             </form>
             <div className="relative my-6">
@@ -146,9 +155,8 @@ export default function SignupPage() {
                 </span>
               </div>
             </div>
-             <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
-                <GoogleIcon className="mr-2 h-5 w-5" />
-                Google
+             <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={anyLoading}>
+                {isGoogleLoading || authLoading ? <LoadingSpinner /> : <><GoogleIcon className="mr-2 h-5 w-5" /> Google</>}
             </Button>
             <div className="mt-6 text-center text-sm">
               Already have an account?{" "}
