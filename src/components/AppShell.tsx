@@ -81,6 +81,7 @@ const ToolItem = ({ tool, pathname }: { tool: Tool; pathname: string }) => {
           <div>
             <Icon />
             <span>{tool.title}</span>
+            {tool.isPremium && <Sparkles className="w-4 h-4 text-yellow-500 ml-auto" />}
           </div>
         </SidebarMenuButton>
       </Link>
@@ -123,7 +124,12 @@ function UserNav() {
                <p className="text-sm font-medium leading-none">
                 {user.displayName ?? 'Anonymous'}
               </p>
-              {user.isPremium && <Badge variant="secondary" className="bg-accent/20 text-accent-foreground border-none"><Sparkles className="w-3 h-3 mr-1 text-accent" /> Premium</Badge>}
+              {user.isPremium && 
+                <Badge variant="outline" className="border-yellow-400/80 text-yellow-500 bg-yellow-400/10">
+                    <Sparkles className="w-3 h-3 mr-1.5" />
+                    Premium
+                </Badge>
+              }
             </div>
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
@@ -144,15 +150,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, loading, authLoading } = useAuth();
   
-  const toolsByCategory = categories.map((category) => ({
-    category,
-    tools: tools.filter((tool) => {
-      if (tool.isPremium) {
-        return user?.isPremium;
-      }
-      return tool.category === category;
-    }),
-  })).filter(c => c.tools.length > 0);
+  const toolsByCategory = categories.map((category) => {
+    // For non-premium users, we filter out the "Premium" category entirely.
+    if (category === 'Premium' && !user?.isPremium) {
+      return null;
+    }
+    return {
+      category,
+      tools: tools.filter((tool) => tool.category === category),
+    };
+  }).filter(Boolean) as { category: ToolCategory; tools: Tool[] }[];
+
 
   if (loading) {
     return <LoadingSpinner isFullScreen />;
@@ -183,7 +191,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <SidebarSeparator />
               {toolsByCategory.map(({ category, tools }) => (
                 <SidebarGroup key={category}>
-                  <SidebarGroupLabel>{category}</SidebarGroupLabel>
+                  <SidebarGroupLabel className="flex items-center">
+                    {category}
+                    {category === 'Premium' && <Sparkles className="w-4 h-4 ml-2 text-yellow-500" />}
+                  </SidebarGroupLabel>
                   {tools.map((tool) => (
                     <ToolItem key={tool.href} tool={tool} pathname={pathname} />
                   ))}

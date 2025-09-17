@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 import { ToolCard } from "@/components/ToolCard";
 import { Input } from "@/components/ui/input";
 import { tools, categories, type Tool, type ToolCategory } from "@/lib/tools";
-import { Search } from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Badge } from "@/components/ui/badge";
 
@@ -15,7 +15,8 @@ export default function Home() {
   const [debouncedSearch] = useDebounce(search, 300);
   const { user } = useAuth();
 
-  const availableTools = tools.filter(tool => !tool.isPremium || (tool.isPremium && user?.isPremium));
+  // Filter tools based on premium status. Non-premium users don't see premium tools.
+  const availableTools = user?.isPremium ? tools : tools.filter(tool => !tool.isPremium);
 
   const filteredTools = availableTools.filter(
     (tool) =>
@@ -28,6 +29,9 @@ export default function Home() {
     category,
     tools: filteredTools.filter((tool) => tool.category === category),
   })).filter(c => c.tools.length > 0);
+
+  // If user is not premium, don't show the premium category.
+  const visibleCategories = user?.isPremium ? categories : categories.filter(c => c !== "Premium");
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -62,7 +66,12 @@ export default function Home() {
                 <section key={category} className="mb-12">
                   <h2 className="text-2xl font-headline font-semibold mb-6 flex items-center gap-4">
                     {category} Tools
-                    {category === 'Premium' && <Badge className="bg-accent text-accent-foreground">Premium</Badge>}
+                    {category === 'Premium' && (
+                        <Badge variant="outline" className="border-yellow-400/80 text-yellow-500 bg-yellow-400/10">
+                            <Sparkles className="w-3 h-3 mr-1.5" />
+                            Premium
+                        </Badge>
+                    )}
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {categoryTools.map((tool) => (
