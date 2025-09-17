@@ -150,16 +150,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, loading, authLoading } = useAuth();
   
-  const toolsByCategory = categories.map((category) => {
-    // For non-premium users, we filter out the "Premium" category entirely.
-    if (category === 'Premium' && !user?.isPremium) {
-      return null;
-    }
-    return {
-      category,
-      tools: tools.filter((tool) => tool.category === category),
-    };
-  }).filter(Boolean) as { category: ToolCategory; tools: Tool[] }[];
+  const toolsByCategory = categories.map((category) => ({
+    category,
+    tools: tools.filter((tool) => tool.category === category),
+  })).filter(c => c.tools.length > 0);
 
 
   if (loading) {
