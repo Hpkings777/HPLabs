@@ -138,18 +138,12 @@ function UserNav() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { authLoading, user } = useAuth();
+  const { authLoading } = useAuth();
 
   const toolsByCategory = categories.map((category) => ({
     category,
     tools: tools.filter((tool) => tool.category === category),
   }));
-  
-  React.useEffect(() => {
-    if (user && (pathname === '/login' || pathname === '/signup')) {
-      window.location.href = '/';
-    }
-  }, [user, pathname]);
 
   return (
     <SidebarProvider>

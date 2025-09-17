@@ -68,7 +68,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await login(auth, email, password);
-      router.push("/");
+      // The useEffect above will handle the redirect
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -84,6 +84,7 @@ export default function LoginPage() {
     setIsGoogleLoading(true);
     try {
         await signInWithGoogle();
+        // The useEffect above will handle the redirect
     } catch (error: any) {
         toast({
             title: "Sign-in Failed",

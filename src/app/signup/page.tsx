@@ -54,7 +54,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const { user, signup, signInWithGoogle, authLoading } = useAuth();
+  const { user, signup, signInWithGoogle, authLoading }_ = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -69,7 +69,7 @@ export default function SignupPage() {
     setIsLoading(true);
     try {
       await signup(auth, email, password);
-      router.push("/");
+      // The useEffect above will handle the redirect
     } catch (error: any) {
       toast({
         title: "Sign Up Failed",
@@ -85,6 +85,7 @@ export default function SignupPage() {
     setIsGoogleLoading(true);
     try {
         await signInWithGoogle();
+        // The useEffect above will handle the redirect
     } catch (error: any) {
         toast({
             title: "Sign-in Failed",
