@@ -42,7 +42,7 @@ export default function AiImageEnhancerPage() {
         <div className="flex flex-col items-center justify-center text-center py-12">
             <Lock className="w-16 h-16 text-muted-foreground mb-4" />
             <h2 className="text-2xl font-semibold mb-2">Access Denied</h2>
-            <p className="text-muted-foreground mb-6">This tool is available for premium users only.</p>
+            <p className="text-muted-foreground mb-6">This tool is available for selected premium users only.</p>
             <Button asChild>
                 <Link href="/">Back to Home</Link>
             </Button>
