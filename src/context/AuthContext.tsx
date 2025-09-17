@@ -39,10 +39,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
+      if (user) {
+        router.push("/");
+      }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   const logout = async () => {
     setUser(null);
@@ -54,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      router.push("/");
+      // No need to router.push here, onAuthStateChanged will handle it.
     } catch (error) {
       console.error("Error signing in with Google", error);
     }
