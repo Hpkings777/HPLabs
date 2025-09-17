@@ -26,7 +26,7 @@ export default function SettingsPage() {
   return (
     <ToolLayout
       title="Settings"
-      description="Customize your HP Labs experience."
+      description="Customize your Tool Hub experience."
     >
       <Card>
         <CardHeader>

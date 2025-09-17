@@ -5,7 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
-  title: "HP Labs",
+  title: "Tool Hub",
   description: "An ultimate multi-tool web app for everyone.",
 };
 
