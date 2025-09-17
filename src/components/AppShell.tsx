@@ -148,7 +148,7 @@ function UserNav() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user, loading, authLoading } = useAuth();
+  const { loading, authLoading } = useAuth();
   
   const toolsByCategory = categories.map((category) => ({
     category,
