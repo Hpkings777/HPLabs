@@ -10,25 +10,20 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Sparkles } from "lucide-react";
 
 export default function HPAIPage() {
-  const { user, loading } = useAuth();
+  const { user, authLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!authLoading && !user) {
       router.push("/login?redirect=/hp-ai");
     }
-  }, [user, loading, router]);
+  }, [user, authLoading, router]);
 
-  if (loading || !user) {
+  if (authLoading || !user) {
     return (
-      <ToolLayout
-        title="HP AI"
-        description="This is a premium feature."
-      >
-        <div className="flex flex-col items-center justify-center text-center py-12">
-           <LoadingSpinner /> 
+        <div className="flex items-center justify-center h-screen">
+           <LoadingSpinner isFullScreen /> 
         </div>
-      </ToolLayout>
     );
   }
 

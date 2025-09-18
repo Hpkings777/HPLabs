@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
@@ -55,20 +55,22 @@ export default function LoginPage() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { user, login, signInWithGoogle, authLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (user) {
-      router.push("/");
+    if (!authLoading && user) {
+      const redirectUrl = searchParams.get("redirect") || "/";
+      router.push(redirectUrl);
     }
-  }, [user, router]);
+  }, [user, authLoading, router, searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await login(auth, email, password);
-      // The onAuthStateChanged listener will handle the redirect
+      await login(email, password);
+      // The onAuthStateChanged listener and useEffect will handle the redirect
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -84,7 +86,7 @@ export default function LoginPage() {
     setIsGoogleLoading(true);
     try {
         await signInWithGoogle();
-        // The onAuthStateChanged listener will handle the redirect
+        // The onAuthStateChanged listener and useEffect will handle the redirect
     } catch (error: any) {
         toast({
             title: "Sign-in Failed",
@@ -98,7 +100,7 @@ export default function LoginPage() {
   
   const anyLoading = isLoading || isGoogleLoading || authLoading;
 
-  if (authLoading && !anyLoading) {
+  if (authLoading && !user) {
     return <LoadingSpinner isFullScreen />;
   }
 

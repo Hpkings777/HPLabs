@@ -17,7 +17,7 @@ import {
   type User as FirebaseAuthUser,
 } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
 
 export interface UserProfile {
   uid: string;
@@ -31,15 +31,15 @@ interface AuthContextType {
   user: UserProfile | null;
   firebaseUser: FirebaseAuthUser | null;
   authLoading: boolean;
-  login: typeof signInWithEmailAndPassword;
-  signup: typeof createUserWithEmailAndPassword;
+  login: (email:string, pass:string) => Promise<any>;
+  signup: (email:string, pass:string) => Promise<any>;
   logout: () => void;
   signInWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const createUserProfileDocument = async (user: FirebaseAuthUser) => {
+const createUserProfileDocument = async (user: FirebaseAuthUser, isGoogleSignIn = false) => {
   const userDocRef = doc(db, "users", user.uid);
   const userSnapshot = await getDoc(userDocRef);
 
@@ -49,16 +49,15 @@ const createUserProfileDocument = async (user: FirebaseAuthUser) => {
       await setDoc(userDocRef, {
         uid,
         email,
-        displayName,
+        displayName: isGoogleSignIn ? displayName : email,
         photoURL,
-        isPremium: false, // Default to false for new users
+        isPremium: false,
         createdAt: new Date(),
       });
     } catch (error) {
       console.error("Error creating user profile document:", error);
     }
   }
-  return userDocRef;
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -68,62 +67,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      setAuthLoading(true);
       if (fbUser) {
         setFirebaseUser(fbUser);
         await createUserProfileDocument(fbUser);
         const userDocRef = doc(db, "users", fbUser.uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-          setUser(userDoc.data() as UserProfile);
-        }
+        
+        // Use onSnapshot to listen for real-time updates
+        const unsubProfile = onSnapshot(userDocRef, (doc) => {
+           if (doc.exists()) {
+            setUser(doc.data() as UserProfile);
+           }
+           setAuthLoading(false);
+        });
+
+        // Cleanup the profile snapshot listener when auth state changes
+        return () => unsubProfile();
+
       } else {
         setFirebaseUser(null);
         setUser(null);
+        setAuthLoading(false);
       }
-      setAuthLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
   const logout = async () => {
-    setAuthLoading(true);
     await signOut(auth);
-    // onAuthStateChanged will handle the rest
   };
 
-  const signup = async (authInstance: typeof auth, ...args: Parameters<typeof createUserWithEmailAndPassword>) => {
-    setAuthLoading(true);
-    const userCredential = await createUserWithEmailAndPassword(authInstance, ...args);
-    // onAuthStateChanged will handle the rest
+  const signup = async (email: string, pass: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    await createUserProfileDocument(userCredential.user);
     return userCredential;
   }
 
-  const login = async (authInstance: typeof auth, ...args: Parameters<typeof signInWithEmailAndPassword>) => {
-    setAuthLoading(true);
-    const userCredential = await signInWithEmailAndPassword(authInstance, ...args);
-    // onAuthStateChanged will handle the rest
-    return userCredential;
+  const login = async (email: string, pass: string) => {
+    return await signInWithEmailAndPassword(auth, email, pass);
   }
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    setAuthLoading(true);
-    try {
-      await signInWithPopup(auth, provider);
-      // onAuthStateChanged will handle setting the user and redirecting.
-    } catch (error: any) {
-      console.error("Error signing in with Google", error);
-      setAuthLoading(false); // Only set to false on error, success is handled by listener
-    }
+    const userCredential = await signInWithPopup(auth, provider);
+    await createUserProfileDocument(userCredential.user, true);
   };
 
   const value: AuthContextType = {
     user,
     firebaseUser,
     authLoading,
-    login: (...args) => login(auth, ...args),
-    signup: (...args) => signup(auth, ...args),
+    login,
+    signup,
     logout,
     signInWithGoogle,
   };

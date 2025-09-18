@@ -160,6 +160,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return <LoadingSpinner isFullScreen />;
   }
 
+  // Do not render the shell for login/signup pages
+  if (pathname === '/login' || pathname === '/signup') {
+    return <>{children}</>;
+  }
+
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen">
@@ -198,7 +204,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <SidebarFooter>
               <SidebarMenu>
                 {bottomNav.map((link) => (
-                  <NavItem key-={link.href} link={link} pathname={pathname} />
+                  <NavItem key={link.href} link={link} pathname={pathname} />
                 ))}
               </SidebarMenu>
             </SidebarFooter>
