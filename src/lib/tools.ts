@@ -25,9 +25,9 @@ export interface Tool {
 
 export const tools: Tool[] = [
   {
-    title: "HP AI",
-    description: "Use AI to upscale and enhance your images. (Premium)",
-    href: "/hp-ai",
+    title: "AI Workbench",
+    description: "A suite of powerful AI tools to generate and analyze content.",
+    href: "/ai-workbench",
     icon: Wand2,
     category: "Premium",
     isPremium: true,
