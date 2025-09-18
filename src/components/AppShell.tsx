@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { GanttChartSquare, User, Sparkles } from "lucide-react";
 import {
   mainNav,
@@ -92,9 +92,15 @@ const ToolItem = ({ tool, pathname }: { tool: Tool; pathname: string }) => {
 
 function UserNav() {
   const { user, logout, authLoading } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/login');
+  }
 
   if (authLoading) {
-    return <LoadingSpinner />;
+    return <div className="h-8 w-8 flex items-center justify-center"><LoadingSpinner /></div>;
   }
 
   if (!user) {
@@ -142,7 +148,7 @@ function UserNav() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logout}>
+        <DropdownMenuItem onClick={handleLogout}>
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -153,6 +159,7 @@ function UserNav() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { authLoading, user } = useAuth();
 
   const toolsByCategory = categories.map((category) => ({
     category,
@@ -162,7 +169,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   // Do not render the shell for login/signup pages
   if (pathname === '/login' || pathname === '/signup') {
+    if (authLoading) return <LoadingSpinner isFullScreen />;
+    if (user) {
+      // This is a temporary state, router will redirect soon.
+      // Show a loading screen to prevent flicker.
+      return <LoadingSpinner isFullScreen />;
+    }
     return <>{children}</>;
+  }
+  
+  if (authLoading) {
+    return <LoadingSpinner isFullScreen />;
   }
 
   return (

@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { GanttChartSquare } from "lucide-react";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -53,24 +51,18 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const { user, login, signInWithGoogle, authLoading } = useAuth();
+  const { login, signInWithGoogle, authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-
-  useEffect(() => {
-    if (!authLoading && user) {
-      const redirectUrl = searchParams.get("redirect") || "/";
-      router.push(redirectUrl);
-    }
-  }, [user, authLoading, router, searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
       await login(email, password);
-      // The onAuthStateChanged listener and useEffect will handle the redirect
+      const redirectUrl = searchParams.get("redirect") || "/";
+      router.push(redirectUrl);
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -86,7 +78,8 @@ export default function LoginPage() {
     setIsGoogleLoading(true);
     try {
         await signInWithGoogle();
-        // The onAuthStateChanged listener and useEffect will handle the redirect
+        const redirectUrl = searchParams.get("redirect") || "/";
+        router.push(redirectUrl);
     } catch (error: any) {
         toast({
             title: "Sign-in Failed",
@@ -99,10 +92,6 @@ export default function LoginPage() {
   }
   
   const anyLoading = isLoading || isGoogleLoading || authLoading;
-
-  if (authLoading && !user) {
-    return <LoadingSpinner isFullScreen />;
-  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
