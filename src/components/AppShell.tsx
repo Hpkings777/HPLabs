@@ -91,7 +91,11 @@ const ToolItem = ({ tool, pathname }: { tool: Tool; pathname: string }) => {
 };
 
 function UserNav() {
-  const { user, logout } = useAuth();
+  const { user, logout, authLoading } = useAuth();
+
+  if (authLoading) {
+    return <LoadingSpinner />;
+  }
 
   if (!user) {
     return (
@@ -149,7 +153,6 @@ function UserNav() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { authLoading } = useAuth();
 
   const toolsByCategory = categories.map((category) => ({
     category,
@@ -160,10 +163,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Do not render the shell for login/signup pages
   if (pathname === '/login' || pathname === '/signup') {
     return <>{children}</>;
-  }
-
-  if (authLoading) {
-    return <LoadingSpinner isFullScreen />;
   }
 
   return (
