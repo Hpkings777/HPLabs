@@ -132,3 +132,110 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* For compact loading spinner inside buttons */
+.compact-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid currentColor;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* For full-screen loading spinner overlay */
+.loading-spinner-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: hsla(var(--background), 0.8);
+  backdrop-filter: blur(4px);
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-spinner-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  text-shadow: 0 0 5px hsl(180, 100%, 80%), 0 0 10px hsl(180, 100%, 80%), 0 0 20px hsl(270, 100%, 80%), 0 0 40px hsl(270, 100%, 80%);
+}
+
+.pulse-wave {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border: 2px solid hsl(180, 100%, 70%);
+  border-radius: 50%;
+  opacity: 0;
+  animation: pulse 3s infinite ease-out;
+}
+
+.pulse-wave:nth-child(2) {
+  animation-delay: 1s;
+  border-color: hsl(270, 100%, 80%);
+}
+
+.pulse-wave:nth-child(3) {
+  animation-delay: 2s;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.ring-particle {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: hsl(var(--primary));
+  border-bottom-color: hsl(var(--primary));
+  opacity: 0.5;
+  animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}

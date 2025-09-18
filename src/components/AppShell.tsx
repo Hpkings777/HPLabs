@@ -41,6 +41,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
 import { LoadingSpinner } from "./ui/loading-spinner";
 import { Badge } from "./ui/badge";
+import { Progress } from "@/components/ui/progress";
 
 const NavItem = ({
   link,
@@ -199,7 +200,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <SidebarFooter>
               <SidebarMenu>
                 {bottomNav.map((link) => (
-                  <NavItem key={link.href} link={link} pathname={pathname} />
+                  <NavItem key-={link.href} link={link} pathname={pathname} />
                 ))}
               </SidebarMenu>
             </SidebarFooter>

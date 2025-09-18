@@ -1,6 +1,5 @@
 
 "use client";
-import "../../app/loading.css";
 import { cn } from "@/lib/utils";
 
 type LoadingSpinnerProps = {
