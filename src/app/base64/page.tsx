@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -16,11 +17,13 @@ export default function Base64Tool() {
 
   const handleEncode = () => {
     try {
-      setOutput(btoa(input));
+      // Use encodeURIComponent to handle Unicode characters correctly
+      const encoded = btoa(unescape(encodeURIComponent(input)));
+      setOutput(encoded);
     } catch (e) {
       toast({
         title: "Encoding Error",
-        description: "Invalid input for Base64 encoding.",
+        description: "Could not encode the provided input.",
         variant: "destructive",
       });
     }
@@ -28,9 +31,10 @@ export default function Base64Tool() {
 
   const handleDecode = () => {
     try {
-      // Handles URL-safe Base64 as well by replacing characters
-      const safeInput = input.replace(/-/g, '+').replace(/_/g, '/');
-      setOutput(atob(safeInput));
+      // Handles URL-safe Base64 and then use decodeURIComponent
+      const safeInput = input.replace(/-/g, "+").replace(/_/g, "/");
+      const decoded = decodeURIComponent(escape(atob(safeInput)));
+      setOutput(decoded);
     } catch (e) {
       toast({
         title: "Decoding Error",
