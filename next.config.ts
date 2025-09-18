@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -42,7 +43,9 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: '/:shortId',
+        // This regex ensures that only short, alphanumeric paths are treated as short IDs.
+        // It excludes reserved paths like 'api', 'public', and full-word tool names.
+        source: '/:shortId([a-zA-Z0-9]{6,12})',
         destination: '/api/redirect/:shortId',
         permanent: false,
       },
