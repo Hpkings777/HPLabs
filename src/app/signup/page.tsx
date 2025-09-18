@@ -1,9 +1,9 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,11 +55,14 @@ export default function SignupPage() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { user, signup, signInWithGoogle, authLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
 
+  const redirectUrl = searchParams.get("redirect") || "/";
+
   if (user) {
-    router.replace("/");
-    return null;
+    router.replace(redirectUrl);
+    return <LoadingSpinner isFullScreen />;
   }
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -75,7 +78,7 @@ export default function SignupPage() {
     setIsLoading(true);
     try {
       await signup(email, password);
-      // The onAuthStateChanged listener will handle the user state update
+      // The AuthProvider will handle the user state update and AppShell will handle redirect
     } catch (error: any) {
       toast({
         title: "Sign Up Failed",
@@ -91,7 +94,7 @@ export default function SignupPage() {
     setIsGoogleLoading(true);
     try {
         await signInWithGoogle();
-        // The onAuthStateChanged listener will handle the user state update
+        // The AuthProvider will handle the user state update and AppShell will handle redirect
     } catch (error: any) {
         toast({
             title: "Sign-in Failed",
@@ -168,7 +171,7 @@ export default function SignupPage() {
             </Button>
             <div className="mt-6 text-center text-sm">
               Already have an account?{" "}
-              <Link href="/login" className="underline">
+              <Link href={"/login" + (redirectUrl ? "?redirect=" + redirectUrl : "")} className="underline">
                 Log in
               </Link>
             </div>

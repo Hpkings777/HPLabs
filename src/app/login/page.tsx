@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { GanttChartSquare } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -57,10 +59,11 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
 
+  const redirectUrl = searchParams.get("redirect") || "/";
+
   if (user) {
-    const redirectUrl = searchParams.get("redirect") || "/";
     router.replace(redirectUrl);
-    return null;
+    return <LoadingSpinner isFullScreen />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -68,8 +71,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await login(email, password);
-      // onAuthStateChanged in AuthProvider will handle the user state update
-      // The redirect logic is now handled in the AppShell and this component
+      // AuthProvider will handle user state update and AppShell will handle redirect
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -85,8 +87,7 @@ export default function LoginPage() {
     setIsGoogleLoading(true);
     try {
         await signInWithGoogle();
-        // onAuthStateChanged in AuthProvider will handle the user state update
-        // The redirect logic is now handled in the AppShell and this component
+        // AuthProvider will handle user state update and AppShell will handle redirect
     } catch (error: any) {
         toast({
             title: "Sign-in Failed",
@@ -163,7 +164,7 @@ export default function LoginPage() {
 
             <div className="mt-6 text-center text-sm">
               Don&apos;t have an account?{" "}
-              <Link href="/signup" className="underline">
+              <Link href={"/signup" + (redirectUrl ? "?redirect=" + redirectUrl : "")} className="underline">
                 Sign up
               </Link>
             </div>

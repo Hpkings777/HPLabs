@@ -12,14 +12,12 @@ import {
   categories,
   type Tool,
   type NavLink,
-  type ToolCategory,
 } from "@/lib/tools";
 import { useAuth } from "@/context/AuthContext";
 
 import {
   Sidebar,
   SidebarProvider,
-  SidebarTrigger,
   SidebarContent,
   SidebarHeader,
   SidebarMenu,
@@ -29,6 +27,7 @@ import {
   SidebarSeparator,
   SidebarGroup,
   SidebarGroupLabel,
+  SidebarTrigger
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -159,7 +158,7 @@ function UserNav() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { authLoading, user } = useAuth();
+  const { authLoading } = useAuth();
 
   const toolsByCategory = categories.map((category) => ({
     category,
@@ -171,73 +170,68 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (authLoading) {
     return <LoadingSpinner isFullScreen />;
   }
-  
-  if (!isAuthPage) {
-    return (
-      <SidebarProvider>
-        <div className="flex min-h-screen">
-          <Sidebar>
-            <SidebarContent>
-              <SidebarHeader>
-                <Link
-                  href="/"
-                  className="flex items-center gap-2"
-                  aria-label="HP Labs Home"
-                >
-                  <GanttChartSquare className="w-8 h-8 text-primary" />
-                  <span className="text-2xl font-bold font-headline text-foreground">
-                    HP Labs
-                  </span>
-                </Link>
-              </SidebarHeader>
-              <SidebarMenu className="flex-1">
-                {mainNav.map((link) => (
+
+  // Render auth pages without the main app shell
+  if (isAuthPage) {
+    return <>{children}</>;
+  }
+
+  // Render the main app shell for all other pages
+  return (
+    <SidebarProvider>
+      <div className="flex min-h-screen">
+        <Sidebar>
+          <SidebarContent>
+            <SidebarHeader>
+              <Link
+                href="/"
+                className="flex items-center gap-2"
+                aria-label="HP Labs Home"
+              >
+                <GanttChartSquare className="w-8 h-8 text-primary" />
+                <span className="text-2xl font-bold font-headline text-foreground">
+                  HP Labs
+                </span>
+              </Link>
+            </SidebarHeader>
+            <SidebarMenu className="flex-1">
+              {mainNav.map((link) => (
+                <NavItem key={link.href} link={link} pathname={pathname} />
+              ))}
+              <SidebarSeparator />
+              {toolsByCategory.map(({ category, tools }) => (
+                <SidebarGroup key={category}>
+                  <SidebarGroupLabel className="flex items-center">
+                    {category}
+                    {category === 'Premium' && <Sparkles className="w-4 h-4 ml-2 text-yellow-500" />}
+                  </SidebarGroupLabel>
+                  {tools.map((tool) => (
+                    <ToolItem key={tool.href} tool={tool} pathname={pathname} />
+                  ))}
+                </SidebarGroup>
+              ))}
+            </SidebarMenu>
+            <SidebarSeparator />
+            <SidebarFooter>
+              <SidebarMenu>
+                {bottomNav.map((link) => (
                   <NavItem key={link.href} link={link} pathname={pathname} />
                 ))}
-                <SidebarSeparator />
-                {toolsByCategory.map(({ category, tools }) => (
-                  <SidebarGroup key={category}>
-                    <SidebarGroupLabel className="flex items-center">
-                      {category}
-                      {category === 'Premium' && <Sparkles className="w-4 h-4 ml-2 text-yellow-500" />}
-                    </SidebarGroupLabel>
-                    {tools.map((tool) => (
-                      <ToolItem key={tool.href} tool={tool} pathname={pathname} />
-                    ))}
-                  </SidebarGroup>
-                ))}
               </SidebarMenu>
-              <SidebarSeparator />
-              <SidebarFooter>
-                <SidebarMenu>
-                  {bottomNav.map((link) => (
-                    <NavItem key={link.href} link={link} pathname={pathname} />
-                  ))}
-                </SidebarMenu>
-              </SidebarFooter>
-            </SidebarContent>
-          </Sidebar>
-          <div className="flex-1 flex flex-col">
-             <header className="flex h-14 lg:h-[60px] items-center gap-4 border-b bg-background px-6">
-              <div className="md:hidden">
-                <SidebarTrigger />
-              </div>
-              <div className="flex-1" />
-              <UserNav />
-            </header>
-            <main className="flex-1">{children}</main>
-          </div>
+            </SidebarFooter>
+          </SidebarContent>
+        </Sidebar>
+        <div className="flex-1 flex flex-col">
+           <header className="flex h-14 lg:h-[60px] items-center gap-4 border-b bg-background px-6">
+            <div className="md:hidden">
+              <SidebarTrigger />
+            </div>
+            <div className="flex-1" />
+            <UserNav />
+          </header>
+          <main className="flex-1">{children}</main>
         </div>
-      </SidebarProvider>
-    );
-  }
-
-  // If on an auth page
-  if (user) {
-    // This is a temporary state, router will redirect soon.
-    // Show a loading screen to prevent flicker of the login page.
-    return <LoadingSpinner isFullScreen />;
-  }
-
-  return <>{children}</>;
+      </div>
+    </SidebarProvider>
+  );
 }
