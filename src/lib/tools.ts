@@ -25,9 +25,10 @@ export interface Tool {
 
 export const tools: Tool[] = [
   {
-    title: "AI Workbench",
-    description: "A suite of powerful AI tools to generate and analyze content.",
-    href: "/ai-workbench",
+    title: "Phorix",
+    description:
+      "Phorix is the next-generation AI created by HP Labs, designed to think beyond boundaries. Its name comes from the fusion of Phantom (unseen, mysterious) and Matrix (the hidden code of reality).",
+    href: "/phorix",
     icon: Wand2,
     category: "Premium",
     isPremium: true,
