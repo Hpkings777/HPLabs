@@ -1,3 +1,6 @@
+
+"use client";
+
 import Link from "next/link";
 import {
   Card,
@@ -12,6 +15,7 @@ import type React from "react";
 import { type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "./ui/badge";
+import { useLoading } from "@/context/LoadingContext";
 
 interface ToolCardProps {
   title: string;
@@ -22,8 +26,16 @@ interface ToolCardProps {
 }
 
 export function ToolCard({ title, description, href, icon: Icon, isPremium }: ToolCardProps) {
+  const { startLoading, isLoading } = useLoading();
+
+  const handleClick = () => {
+    if (!isLoading) {
+        startLoading();
+    }
+  };
+
   return (
-    <Link href={href} className="group block h-full">
+    <Link href={href} className="group block h-full" onClick={handleClick}>
       <Card className={cn(
         "h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col",
         isPremium 

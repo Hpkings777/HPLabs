@@ -1,106 +1,160 @@
-/* For compact loading spinner inside buttons */
-.compact-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid currentColor;
-  border-bottom-color: transparent;
-  border-radius: 50%;
-  display: inline-block;
-  box-sizing: border-box;
-  animation: rotation 1s linear infinite;
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-@keyframes rotation {
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    text-shadow:
+      0 0 4px #fff,
+      0 0 11px #fff,
+      0 0 19px #fff,
+      0 0 40px #0fa,
+      0 0 80px #0fa,
+      0 0 90px #0fa,
+      0 0 100px #0fa,
+      0 0 150px #0fa;
+  }
+  20%, 24%, 55% {
+    text-shadow: none;
+  }
+}
+
+@keyframes scan {
   0% {
-    transform: rotate(0deg);
+    transform: translateY(-100%);
   }
   100% {
-    transform: rotate(360deg);
+    transform: translateY(100%);
   }
 }
 
-/* For full-screen loading spinner overlay */
-.loading-spinner-overlay {
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes crack {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+.loading-overlay {
   position: fixed;
   inset: 0;
-  background-color: hsla(var(--background), 0.8);
+  background: radial-gradient(ellipse at center, rgba(10, 20, 30, 0.8) 0%, rgba(5, 10, 15, 0.95) 100%);
   backdrop-filter: blur(4px);
   z-index: 5000;
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: fadeIn 0.3s ease-out;
 }
 
-.loading-spinner-container {
+.loading-overlay.fade-out {
+  animation: fadeOut 0.5s ease-in forwards;
+}
+
+.loading-container {
   position: relative;
-  width: 200px;
+  width: 350px;
   height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: pulse 4s infinite ease-in-out;
+}
+
+.loading-rectangle {
+  position: absolute;
+  inset: 0;
+  border: 2px solid #0ff;
+  box-shadow:
+    0 0 5px #0ff,
+    0 0 15px #0ff,
+    inset 0 0 5px #0ff,
+    0 0 25px #f0f,
+    inset 0 0 25px #f0f;
+  border-radius: 8px;
 }
 
 .loading-text {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  color: hsl(var(--foreground));
-  text-shadow: 0 0 5px hsl(180, 100%, 80%), 0 0 10px hsl(180, 100%, 80%), 0 0 20px hsl(270, 100%, 80%), 0 0 40px hsl(270, 100%, 80%);
+  color: #fff;
+  animation: flicker 2s linear infinite;
+  z-index: 1;
 }
 
-.pulse-wave {
+.scan-bar {
   position: absolute;
-  width: 100px;
-  height: 100px;
-  border: 2px solid hsl(180, 100%, 70%);
-  border-radius: 50%;
-  opacity: 0;
-  animation: pulse 3s infinite ease-out;
+  left: 0;
+  right: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
-.pulse-wave:nth-child(2) {
-  animation-delay: 1s;
-  border-color: hsl(270, 100%, 80%);
-}
-
-.pulse-wave:nth-child(3) {
-  animation-delay: 2s;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(2.5);
-    opacity: 0;
-  }
-}
-
-.ring-particle {
+.scan-bar::before {
+  content: '';
   position: absolute;
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  border-top-color: hsl(var(--primary));
-  border-bottom-color: hsl(var(--primary));
-  opacity: 0.5;
-  animation: spin 3s linear infinite;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #0ff;
+  box-shadow: 0 0 5px #0ff;
+  animation: scan 1.5s linear infinite alternate;
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg) scale(1);
-  }
-  50% {
-    transform: rotate(180deg) scale(1.1);
-  }
-  100% {
-    transform: rotate(360deg) scale(1);
-  }
+.crack-effect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 0 V100 M0 50 H100 M20 20 L80 80 M20 80 L80 20" stroke="rgba(255,255,255,0.8)" stroke-width="2" fill="none" transform="rotate(10 50 50)"/></svg>');
+  background-size: cover;
+  animation: crack 0.5s ease-out forwards;
+  z-index: 10;
+}
+
+.timeout-message {
+  color: #ff4d4d;
+  font-family: 'Space Grotesk', sans-serif;
+  text-align: center;
+  z-index: 5;
+  padding: 20px;
+  animation: fadeIn 0.5s ease-out;
 }

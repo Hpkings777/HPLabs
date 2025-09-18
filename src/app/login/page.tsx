@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { GanttChartSquare } from "lucide-react";
+import { useLoading } from "@/context/LoadingContext";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 
@@ -52,26 +53,28 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isActionLoading, setIsActionLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { login, signInWithGoogle, authLoading, user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const { isLoading: isPageLoading, startLoading } = useLoading();
 
   const redirectUrl = searchParams.get("redirect") || "/";
 
   if (user) {
     router.replace(redirectUrl);
-    return <LoadingSpinner isFullScreen />;
+    return <div className="h-screen w-screen flex items-center justify-center"><LoadingSpinner /></div>;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsActionLoading(true);
     try {
       await login(email, password);
-      // AuthProvider will handle user state update and AppShell will handle redirect
+      startLoading();
+      router.push(redirectUrl);
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -79,7 +82,7 @@ export default function LoginPage() {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsActionLoading(false);
     }
   };
 
@@ -87,7 +90,8 @@ export default function LoginPage() {
     setIsGoogleLoading(true);
     try {
         await signInWithGoogle();
-        // AuthProvider will handle user state update and AppShell will handle redirect
+        startLoading();
+        router.push(redirectUrl);
     } catch (error: any) {
         toast({
             title: "Sign-in Failed",
@@ -99,7 +103,7 @@ export default function LoginPage() {
     }
   }
   
-  const anyLoading = isLoading || isGoogleLoading || authLoading;
+  const anyLoading = isActionLoading || isGoogleLoading || authLoading || isPageLoading;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
@@ -145,7 +149,7 @@ export default function LoginPage() {
                 />
               </div>
               <Button type="submit" className="w-full" disabled={anyLoading}>
-                {isLoading ? <span className="compact-spinner" /> : "Log In"}
+                {isActionLoading ? <LoadingSpinner /> : "Log In"}
               </Button>
             </form>
             <div className="relative my-6">
@@ -159,7 +163,7 @@ export default function LoginPage() {
               </div>
             </div>
             <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={anyLoading}>
-                {isGoogleLoading ? <span className="compact-spinner" /> : <><GoogleIcon className="mr-2 h-5 w-5" /> Google</>}
+                {isGoogleLoading ? <LoadingSpinner /> : <><GoogleIcon className="mr-2 h-5 w-5" /> Google</>}
             </Button>
 
             <div className="mt-6 text-center text-sm">

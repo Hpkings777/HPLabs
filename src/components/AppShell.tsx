@@ -14,6 +14,8 @@ import {
   type NavLink,
 } from "@/lib/tools";
 import { useAuth } from "@/context/AuthContext";
+import { useLoading } from "@/context/LoadingContext";
+
 
 import {
   Sidebar,
@@ -50,9 +52,15 @@ const NavItem = ({
   pathname:string;
 }) => {
   const Icon = link.icon;
+  const { startLoading, isLoading } = useLoading();
+  const handleClick = () => {
+    if (pathname !== link.href && !isLoading) {
+      startLoading();
+    }
+  };
   return (
     <SidebarMenuItem>
-      <Link href={link.href} passHref>
+      <Link href={link.href} passHref onClick={handleClick}>
         <SidebarMenuButton
           asChild
           isActive={pathname === link.href}
@@ -70,9 +78,15 @@ const NavItem = ({
 
 const ToolItem = ({ tool, pathname }: { tool: Tool; pathname: string }) => {
   const Icon = tool.icon;
+  const { startLoading, isLoading } = useLoading();
+  const handleClick = () => {
+    if (pathname !== tool.href && !isLoading) {
+      startLoading();
+    }
+  };
   return (
     <SidebarMenuItem>
-      <Link href={tool.href} passHref>
+      <Link href={tool.href} passHref onClick={handleClick}>
         <SidebarMenuButton
           asChild
           isActive={pathname === tool.href}

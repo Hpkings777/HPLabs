@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { AppShell } from "@/components/AppShell";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/context/AuthContext";
+import { LoadingProvider } from "@/context/LoadingContext";
+import { LoadingOverlay } from "@/components/ui/loading-overlay";
 
 export const metadata: Metadata = {
   title: "HP Labs",
@@ -41,9 +43,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>
-            <AppShell>{children}</AppShell>
-          </AuthProvider>
+          <LoadingProvider>
+            <AuthProvider>
+                <AppShell>{children}</AppShell>
+                <LoadingOverlay />
+            </AuthProvider>
+          </LoadingProvider>
           <Toaster />
         </ThemeProvider>
       </body>

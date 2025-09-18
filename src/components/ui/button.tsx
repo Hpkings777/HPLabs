@@ -1,7 +1,11 @@
+
+"use client";
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-
+import { useLoading } from "@/context/LoadingContext";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
@@ -40,12 +44,34 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, onClick, ...props }, ref) => {
+    const { startLoading, isLoading } = useLoading();
+    const router = useRouter();
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      const element = e.currentTarget;
+      // Check if the button is inside a Link
+      const isLink = element.closest('a') || (asChild && props.children && React.isValidElement(props.children) && props.children.type === 'a');
+      
+      // We only want to trigger the loader for navigation, not for actions like form submits
+      // A simple way is to see if it's a link or if it has an href on a child.
+      // This is not foolproof but covers many cases.
+      if (isLink && !props.disabled && !isLoading) {
+        startLoading();
+      }
+      
+      if(onClick) {
+        onClick(e);
+      }
+    };
+    
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        onClick={handleClick}
+        disabled={props.disabled || isLoading}
         {...props}
       />
     )
