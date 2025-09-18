@@ -10,6 +10,7 @@ import {
   Home,
   User,
   Wand2,
+  Sparkles,
 } from "lucide-react";
 
 export type ToolCategory = "Security" | "Developer" | "Utility" | "Premium";
@@ -25,13 +26,21 @@ export interface Tool {
 
 export const tools: Tool[] = [
   {
+    title: "AI Workbench",
+    description:
+      "A suite of powerful, next-generation AI tools for content generation, analysis, and more. Exclusive for premium users.",
+    href: "/ai-workbench",
+    icon: Sparkles,
+    category: "Premium",
+    isPremium: true,
+  },
+  {
     title: "Phorix",
     description:
       "Phorix is the next-generation AI created by HP Labs, designed to think beyond boundaries. Its name comes from the fusion of Phantom (unseen, mysterious) and Matrix (the hidden code of reality).",
     href: "/phorix",
     icon: Wand2,
-    category: "Premium",
-    isPremium: true,
+    category: "Utility",
   },
   {
     title: "Base64 Tool",
