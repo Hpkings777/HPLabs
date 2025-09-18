@@ -13,7 +13,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-export type ToolCategory = "Security" | "Developer" | "Utility" | "Premium";
+export type ToolCategory = "AI" | "Security" | "Developer" | "Utility" | "Premium";
 
 export interface Tool {
   title: string;
@@ -40,7 +40,7 @@ export const tools: Tool[] = [
       "Phorix is the next-generation AI created by HP Labs, designed to think beyond boundaries. Its name comes from the fusion of Phantom (unseen, mysterious) and Matrix (the hidden code of reality).",
     href: "/phorix",
     icon: Wand2,
-    category: "Utility",
+    category: "AI",
   },
   {
     title: "Base64 Tool",
@@ -111,4 +111,4 @@ export const bottomNav: NavLink[] = [
     }
 ]
 
-export const categories: ToolCategory[] = ["Premium", "Developer", "Security", "Utility"];
+export const categories: ToolCategory[] = ["AI", "Premium", "Developer", "Security", "Utility"];
