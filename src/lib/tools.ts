@@ -111,4 +111,4 @@ export const bottomNav: NavLink[] = [
     }
 ]
 
-export const categories: ToolCategory[] = ["AI", "Premium", "Developer", "Security", "Utility"];
+export const categories: ToolCategory[] = ["Premium", "AI", "Developer", "Security", "Utility"];
