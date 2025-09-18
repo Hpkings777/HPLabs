@@ -91,6 +91,7 @@
   width: 350px;
   height: 200px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   animation: pulse 4s infinite ease-in-out;
@@ -118,12 +119,23 @@
   z-index: 1;
 }
 
+.loading-subtext {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  color: #0ff;
+  margin-top: 0.5rem;
+  text-shadow: 0 0 5px #0fa;
+  z-index: 1;
+  height: 1.2rem; /* Reserve space */
+}
+
 .scan-bar {
   position: absolute;
   left: 0;
   right: 0;
   height: 100%;
   overflow: hidden;
+  border-radius: 8px;
 }
 
 .scan-bar::before {
