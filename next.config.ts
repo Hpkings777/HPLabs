@@ -40,17 +40,6 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
   },
-  async redirects() {
-    return [
-      {
-        // This regex ensures that only short, alphanumeric paths are treated as short IDs.
-        // It excludes reserved paths like 'api', 'public', and full-word tool names.
-        source: '/:shortId([a-zA-Z0-9]{6,12})',
-        destination: '/api/redirect/:shortId',
-        permanent: false,
-      },
-    ];
-  },
 };
 
 export default nextConfig;
