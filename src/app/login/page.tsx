@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -51,18 +52,24 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const { login, signInWithGoogle, authLoading } = useAuth();
+  const { login, signInWithGoogle, authLoading, user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+
+  if (user) {
+    const redirectUrl = searchParams.get("redirect") || "/";
+    router.replace(redirectUrl);
+    return null;
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
       await login(email, password);
-      const redirectUrl = searchParams.get("redirect") || "/";
-      router.push(redirectUrl);
+      // onAuthStateChanged in AuthProvider will handle the user state update
+      // The redirect logic is now handled in the AppShell and this component
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -78,8 +85,8 @@ export default function LoginPage() {
     setIsGoogleLoading(true);
     try {
         await signInWithGoogle();
-        const redirectUrl = searchParams.get("redirect") || "/";
-        router.push(redirectUrl);
+        // onAuthStateChanged in AuthProvider will handle the user state update
+        // The redirect logic is now handled in the AppShell and this component
     } catch (error: any) {
         toast({
             title: "Sign-in Failed",

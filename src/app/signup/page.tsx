@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -56,11 +57,10 @@ export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (user) {
-      router.push("/");
-    }
-  }, [user, router]);
+  if (user) {
+    router.replace("/");
+    return null;
+  }
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,8 +74,8 @@ export default function SignupPage() {
     }
     setIsLoading(true);
     try {
-      await signup(auth, email, password);
-      // The onAuthStateChanged listener will handle the redirect
+      await signup(email, password);
+      // The onAuthStateChanged listener will handle the user state update
     } catch (error: any) {
       toast({
         title: "Sign Up Failed",
@@ -91,7 +91,7 @@ export default function SignupPage() {
     setIsGoogleLoading(true);
     try {
         await signInWithGoogle();
-        // The onAuthStateChanged listener will handle the redirect
+        // The onAuthStateChanged listener will handle the user state update
     } catch (error: any) {
         toast({
             title: "Sign-in Failed",
@@ -104,10 +104,6 @@ export default function SignupPage() {
   }
 
   const anyLoading = isLoading || isGoogleLoading || authLoading;
-
-  if (authLoading && !anyLoading) {
-    return <LoadingSpinner isFullScreen />;
-  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
