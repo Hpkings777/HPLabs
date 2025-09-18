@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -124,7 +125,7 @@ function UserNav() {
                <p className="text-sm font-medium leading-none">
                 {user.displayName ?? 'Anonymous'}
               </p>
-              {user.isPremium && 
+              {user.isPremium &&
                 <Badge variant="outline" className="border-yellow-400/80 text-yellow-500 bg-yellow-400/10">
                     <Sparkles className="w-3 h-3 mr-1.5" />
                     Premium
@@ -149,22 +150,21 @@ function UserNav() {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { authLoading } = useAuth();
-  
+
   const toolsByCategory = categories.map((category) => ({
     category,
     tools: tools.filter((tool) => tool.category === category),
   })).filter(c => c.tools.length > 0);
 
 
-  if (authLoading) {
-    return <LoadingSpinner isFullScreen />;
-  }
-
   // Do not render the shell for login/signup pages
   if (pathname === '/login' || pathname === '/signup') {
     return <>{children}</>;
   }
 
+  if (authLoading) {
+    return <LoadingSpinner isFullScreen />;
+  }
 
   return (
     <SidebarProvider>

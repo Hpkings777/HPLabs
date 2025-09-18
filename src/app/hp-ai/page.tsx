@@ -5,7 +5,6 @@ import { useAuth } from "@/context/AuthContext";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Sparkles } from "lucide-react";
 
@@ -13,17 +12,21 @@ export default function HPAIPage() {
   const { user, authLoading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/login?redirect=/hp-ai");
-    }
-  }, [user, authLoading, router]);
-
-  if (authLoading || !user) {
+  if (authLoading) {
     return (
         <div className="flex items-center justify-center h-screen">
-           <LoadingSpinner isFullScreen /> 
+           <LoadingSpinner isFullScreen />
         </div>
+    );
+  }
+
+  if (!user) {
+    // This should ideally not be reached if AppShell handles redirects,
+    // but as a fallback.
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Redirecting to login...</p>
+      </div>
     );
   }
 
