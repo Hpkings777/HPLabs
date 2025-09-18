@@ -154,7 +154,7 @@ export default function SignupPage() {
                 />
               </div>
               <Button type="submit" className="w-full" disabled={anyLoading}>
-                {isLoading ? <LoadingSpinner /> : "Create Account"}
+                {isLoading ? <span className="compact-spinner" /> : "Create Account"}
               </Button>
             </form>
             <div className="relative my-6">
@@ -168,7 +168,7 @@ export default function SignupPage() {
               </div>
             </div>
              <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={anyLoading}>
-                {isGoogleLoading ? <LoadingSpinner /> : <><GoogleIcon className="mr-2 h-5 w-5" /> Google</>}
+                {isGoogleLoading ? <span className="compact-spinner" /> : <><GoogleIcon className="mr-2 h-5 w-5" /> Google</>}
             </Button>
             <div className="mt-6 text-center text-sm">
               Already have an account?{" "}

@@ -30,7 +30,6 @@ export interface UserProfile {
 interface AuthContextType {
   user: UserProfile | null;
   firebaseUser: FirebaseAuthUser | null;
-  loading: boolean;
   authLoading: boolean;
   login: typeof signInWithEmailAndPassword;
   signup: typeof createUserWithEmailAndPassword;
@@ -65,7 +64,6 @@ const createUserProfileDocument = async (user: FirebaseAuthUser) => {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [firebaseUser, setFirebaseUser] = useState<FirebaseAuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
@@ -82,7 +80,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setFirebaseUser(null);
         setUser(null);
       }
-      setLoading(false);
       setAuthLoading(false);
     });
 
@@ -92,21 +89,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     setAuthLoading(true);
     await signOut(auth);
-    setUser(null);
-    setFirebaseUser(null);
-    // No need to push here, handled by pages
+    // onAuthStateChanged will handle the rest
   };
 
-  const signup = async (...args: Parameters<typeof createUserWithEmailAndPassword>) => {
+  const signup = async (authInstance: typeof auth, ...args: Parameters<typeof createUserWithEmailAndPassword>) => {
     setAuthLoading(true);
-    const userCredential = await createUserWithEmailAndPassword(...args);
+    const userCredential = await createUserWithEmailAndPassword(authInstance, ...args);
     // onAuthStateChanged will handle the rest
     return userCredential;
   }
 
-  const login = async (...args: Parameters<typeof signInWithEmailAndPassword>) => {
+  const login = async (authInstance: typeof auth, ...args: Parameters<typeof signInWithEmailAndPassword>) => {
     setAuthLoading(true);
-    const userCredential = await signInWithEmailAndPassword(...args);
+    const userCredential = await signInWithEmailAndPassword(authInstance, ...args);
     // onAuthStateChanged will handle the rest
     return userCredential;
   }
@@ -126,10 +121,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextType = {
     user,
     firebaseUser,
-    loading,
     authLoading,
-    login,
-    signup,
+    login: (...args) => login(auth, ...args),
+    signup: (...args) => signup(auth, ...args),
     logout,
     signInWithGoogle,
   };

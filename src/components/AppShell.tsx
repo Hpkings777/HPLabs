@@ -41,7 +41,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
 import { LoadingSpinner } from "./ui/loading-spinner";
 import { Badge } from "./ui/badge";
-import { Progress } from "@/components/ui/progress";
 
 const NavItem = ({
   link,
@@ -149,7 +148,7 @@ function UserNav() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { loading, authLoading } = useAuth();
+  const { authLoading } = useAuth();
   
   const toolsByCategory = categories.map((category) => ({
     category,
@@ -157,13 +156,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   })).filter(c => c.tools.length > 0);
 
 
-  if (loading) {
+  if (authLoading) {
     return <LoadingSpinner isFullScreen />;
   }
 
   return (
     <SidebarProvider>
-      {authLoading && <LoadingSpinner isFullScreen />}
       <div className="flex min-h-screen">
         <Sidebar>
           <SidebarContent>
