@@ -4,7 +4,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { GanttChartSquare, User, Sparkles } from "lucide-react";
+import { GanttChartSquare, User, Sparkles, Coins } from "lucide-react";
 import {
   mainNav,
   bottomNav,
@@ -147,6 +147,16 @@ function UserNav() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2">
+              <Coins className="w-4 h-4 text-muted-foreground" />
+              <span>Credits</span>
+            </div>
+            <span className="font-bold">{user.credits}</span>
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
           Log out
         </DropdownMenuItem>
@@ -158,7 +168,6 @@ function UserNav() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { authLoading } = useAuth();
 
   const toolsByCategory = categories.map((category) => ({
     category,
@@ -167,16 +176,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const isAuthPage = pathname === '/login' || pathname === '/signup';
 
-  if (authLoading) {
-    return <LoadingSpinner isFullScreen />;
-  }
-
-  // Render auth pages without the main app shell
   if (isAuthPage) {
     return <>{children}</>;
   }
 
-  // Render the main app shell for all other pages
   return (
     <SidebarProvider>
       <div className="flex min-h-screen">

@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -25,6 +26,7 @@ export interface UserProfile {
   displayName: string | null;
   photoURL: string | null;
   isPremium: boolean;
+  credits: number;
 }
 
 interface AuthContextType {
@@ -52,6 +54,7 @@ const createUserProfileDocument = async (user: FirebaseAuthUser, isGoogleSignIn 
         displayName: isGoogleSignIn ? displayName : email,
         photoURL,
         isPremium: false,
+        credits: 10, // Grant 10 free credits on signup
         createdAt: new Date(),
       });
     } catch (error) {
@@ -70,18 +73,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAuthLoading(true);
       if (fbUser) {
         setFirebaseUser(fbUser);
-        await createUserProfileDocument(fbUser);
         const userDocRef = doc(db, "users", fbUser.uid);
         
-        // Use onSnapshot to listen for real-time updates
         const unsubProfile = onSnapshot(userDocRef, (doc) => {
            if (doc.exists()) {
             setUser(doc.data() as UserProfile);
+           } else {
+             // This can happen if the user was deleted directly from Firebase console
+             // or if document creation failed.
+             createUserProfileDocument(fbUser).then(() => {
+                // The snapshot listener will pick up the new document.
+             });
            }
            setAuthLoading(false);
+        }, (error) => {
+            console.error("Error listening to user profile:", error);
+            setAuthLoading(false);
         });
 
-        // Cleanup the profile snapshot listener when auth state changes
         return () => unsubProfile();
 
       } else {
