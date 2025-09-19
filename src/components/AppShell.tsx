@@ -43,6 +43,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
 import { LoadingSpinner } from "./ui/loading-spinner";
 import { Badge } from "./ui/badge";
+import { InitialLoader } from "./ui/InitialLoader";
 
 const NavItem = ({
   link,
@@ -182,7 +183,15 @@ function UserNav() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
+  const [isInitialLoad, setIsInitialLoad] = React.useState(true);
+
+  React.useEffect(() => {
+    if (!authLoading) {
+      const timer = setTimeout(() => setIsInitialLoad(false), 5000); // Match animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [authLoading]);
 
   const availableTools = tools.filter(tool => !tool.isAdmin || (user?.isAdmin));
 
@@ -192,6 +201,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   })).filter(c => c.tools.length > 0);
 
   const isAuthPage = pathname === '/login' || pathname === '/signup';
+
+  if (isInitialLoad) {
+    return <InitialLoader />;
+  }
 
   if (isAuthPage) {
     return <>{children}</>;
