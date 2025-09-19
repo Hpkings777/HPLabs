@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useActions, useStreamableValue } from 'genkit/next';
+import { useActions, useStreamableValue } from '@genkit-ai/next/client';
 import { phorixFlow } from '@/ai/flows/phorix-flow';
 
 type Message = {

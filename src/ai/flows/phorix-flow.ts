@@ -10,7 +10,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { Message, streamFlow } from 'genkit/next';
+import { Message, streamFlow } from '@genkit-ai/next';
 
 export const PhorixFlowInputSchema = z.object({
   messages: z.array(
