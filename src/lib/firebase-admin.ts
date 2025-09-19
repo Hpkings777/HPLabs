@@ -22,10 +22,9 @@ export function ensureAdminDb() {
             console.warn("FIREBASE_SERVICE_ACCOUNT_KEY is not set. Admin features will be disabled.");
             db = null;
         }
-    }
-    if (!db) {
-        // This will be null if initialization failed.
-        db = admin.apps.length ? admin.firestore() : null;
+    } else if (!db) {
+        // App is initialized, but db might not be.
+        db = admin.firestore();
     }
 
     if (!db) {
