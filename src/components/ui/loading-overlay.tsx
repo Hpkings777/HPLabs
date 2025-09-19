@@ -31,7 +31,7 @@ export function LoadingOverlay() {
     if (isLoading) {
       setShow(true);
       
-      // Minimum 3s display. Changed from 3s to 5s as per new req.
+      // Minimum 5s display.
       minTimeId = setTimeout(() => {
         // If loading has already finished by the time the minimum display time is up, then hide it.
         if (!isLoading) {
@@ -55,9 +55,13 @@ export function LoadingOverlay() {
         }
       }, 8000);
 
-    } else if (show && !minTimeId) {
+    } else if (show) {
        // This handles the case where stopLoading() is called before the min display time is up.
        // The logic inside the minTimeId timeout will handle the closing.
+       // If minTimeId is null, it means it has already fired, so we can finish loading.
+       if(!minTimeId) {
+            handleFinishLoading();
+       }
     }
 
     return () => {
@@ -65,6 +69,15 @@ export function LoadingOverlay() {
       if (minTimeId) clearTimeout(minTimeId);
     };
   }, [isLoading, show, handleFinishLoading, router]);
+
+  useEffect(() => {
+      // This effect listens for route changes and stops the loader
+      // This is a failsafe for the onClick handlers in buttons
+      if(isLoading){
+        stopLoading();
+      }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   if (!show) {
     return null;

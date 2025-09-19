@@ -101,7 +101,7 @@
 .loading-overlay {
   position: fixed;
   inset: 0;
-  background-color: hsla(231, 39%, 10%, 0.8);
+  background-color: hsla(var(--background), 0.8);
   backdrop-filter: blur(8px);
   z-index: 5000;
   display: flex;
@@ -129,9 +129,9 @@
   position: absolute;
   inset: 0;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: hsla(var(--foreground), 0.05);
+  border: 1px solid hsla(var(--border));
+  box-shadow: 0 8px 32px 0 hsla(var(--foreground), 0.1);
   overflow: hidden;
 }
 
@@ -145,9 +145,9 @@
   height: 100%;
   background: linear-gradient(
     to right,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0) 100%
+    hsla(var(--foreground), 0) 0%,
+    hsla(var(--foreground), 0.1) 50%,
+    hsla(var(--foreground), 0) 100%
   );
   animation: shimmer 3s infinite linear;
 }
@@ -161,7 +161,7 @@
   z-index: -1;
   height: 4px;
   width: 150%;
-  background: linear-gradient(90deg, transparent, #00ffff, transparent);
+  background: linear-gradient(90deg, transparent, hsl(var(--accent)), transparent);
   animation: slide-bar-h 4s infinite linear;
 }
 
@@ -180,7 +180,7 @@
     z-index: -1;
     width: 4px;
     height: 150%;
-    background: linear-gradient(0deg, transparent, #8A2BE2, transparent);
+    background: linear-gradient(0deg, transparent, hsl(var(--primary)), transparent);
     animation: slide-bar-v 3.5s infinite linear;
     left: 20px;
     animation-delay: -1.75s;
@@ -192,7 +192,7 @@
   font-family: 'Space Grotesk', sans-serif;
   font-size: 3rem;
   font-weight: 700;
-  color: #fff;
+  color: hsl(var(--foreground));
   z-index: 1;
 }
 
@@ -206,17 +206,18 @@
   width: 100%;
   height: 100%;
   background: transparent;
+  color: hsl(var(--foreground));
 }
 
 .loading-text::before {
   left: 2px;
-  text-shadow: -2px 0 #8A2BE2; /* Deep Purple */
+  text-shadow: -2px 0 hsl(var(--primary));
   animation: text-glitch 4s infinite linear alternate-reverse;
 }
 
 .loading-text::after {
   left: -2px;
-  text-shadow: -2px 0 #00ffff, 2px 2px #8A2BE2; /* Neon Cyan + Deep Purple */
+  text-shadow: -2px 0 hsl(var(--accent)), 2px 2px hsl(var(--primary));
   animation: text-glitch 4s infinite linear alternate;
 }
 
@@ -224,9 +225,9 @@
 .loading-subtext {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 1rem;
-  color: #00ffff;
+  color: hsl(var(--accent));
   margin-top: 0.5rem;
-  text-shadow: 0 0 5px #00ffff;
+  text-shadow: 0 0 5px hsl(var(--accent));
   z-index: 1;
   height: 1.2rem; /* Reserve space */
   opacity: 0;
@@ -244,14 +245,14 @@
   left: 50%;
   width: 200px;
   height: 200px;
-  background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 0 V100 M0 50 H100 M20 20 L80 80 M20 80 L80 20" stroke="rgba(0, 255, 255, 0.8)" stroke-width="1" fill="none" transform="rotate(10 50 50)"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 0 V100 M0 50 H100 M20 20 L80 80 M20 80 L80 20" stroke="hsla(var(--accent), 0.8)" stroke-width="1" fill="none" transform="rotate(10 50 50)"/></svg>');
   background-size: cover;
   animation: crack 0.5s ease-out forwards;
   z-index: 10;
 }
 
 .timeout-message {
-  color: #ff4d4d;
+  color: hsl(var(--destructive));
   font-family: 'Space Grotesk', sans-serif;
   text-align: center;
   z-index: 5;
