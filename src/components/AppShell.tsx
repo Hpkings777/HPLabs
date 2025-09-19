@@ -4,7 +4,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { GanttChartSquare, User, Sparkles, Coins } from "lucide-react";
+import { GanttChartSquare, User, Sparkles, Coins, Shield } from "lucide-react";
 import {
   mainNav,
   bottomNav,
@@ -89,7 +89,7 @@ const ToolItem = ({ tool, pathname }: { tool: Tool; pathname: string }) => {
       <Link href={tool.href} passHref onClick={handleClick}>
         <SidebarMenuButton
           asChild
-          isActive={pathname === tool.href}
+          isActive={pathname.startsWith(tool.href)}
           tooltip={tool.title}
         >
           <div>
@@ -182,6 +182,7 @@ function UserNav() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const toolsByCategory = categories.map((category) => ({
     category,
@@ -244,6 +245,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <SidebarTrigger />
             </div>
             <div className="flex-1" />
+            {user?.isAdmin && (
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/admin">
+                  <Shield className="w-4 h-4 mr-2" />
+                  Admin Panel
+                </Link>
+              </Button>
+            )}
             <UserNav />
           </header>
           <main className="flex-1">{children}</main>

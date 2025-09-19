@@ -1,3 +1,4 @@
+
 import type { LucideIcon } from "lucide-react";
 import {
   FileText,
@@ -11,9 +12,10 @@ import {
   User,
   Wand2,
   Sparkles,
+  Shield,
 } from "lucide-react";
 
-export type ToolCategory = "AI" | "Security" | "Developer" | "Utility" | "Premium";
+export type ToolCategory = "Admin" | "AI" | "Security" | "Developer" | "Utility" | "Premium";
 
 export interface Tool {
   title: string;
@@ -22,9 +24,18 @@ export interface Tool {
   icon: LucideIcon;
   category: ToolCategory;
   isPremium?: boolean;
+  isAdmin?: boolean;
 }
 
 export const tools: Tool[] = [
+  {
+    title: "Admin Panel",
+    description: "Manage users and application settings.",
+    href: "/admin",
+    icon: Shield,
+    category: "Admin",
+    isAdmin: true,
+  },
   {
     title: "AI Workbench",
     description:
@@ -111,4 +122,4 @@ export const bottomNav: NavLink[] = [
     }
 ]
 
-export const categories: ToolCategory[] = ["Premium", "AI", "Developer", "Security", "Utility"];
+export const categories: ToolCategory[] = ["Admin", "Premium", "AI", "Developer", "Security", "Utility"];

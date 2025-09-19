@@ -27,6 +27,7 @@ export interface UserProfile {
   photoURL: string | null;
   isPremium: boolean;
   credits: number;
+  isAdmin: boolean;
 }
 
 interface AuthContextType {
@@ -55,6 +56,7 @@ const createUserProfileDocument = async (user: FirebaseAuthUser, isGoogleSignIn 
         photoURL,
         isPremium: false,
         credits: 10, // Grant 10 free credits on signup
+        isAdmin: false, // Default to not admin
         createdAt: new Date(),
       });
     } catch (error) {
