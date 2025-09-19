@@ -3,23 +3,24 @@
 
 import { revalidatePath } from "next/cache";
 import * as admin from "firebase-admin";
-import { adminDb, ensureAdminDb } from "@/lib/firebase-admin";
+import { ensureAdminDb } from "@/lib/firebase-admin";
 import { UserProfile } from "@/context/AuthContext";
 
 async function verifyAdmin() {
     // In a real app, you'd get the current user's session and verify they are an admin.
     // For this prototype, we'll assume the action is triggered by an authorized admin.
     // This is a critical security step for a production application.
-    await ensureAdminDb();
+    ensureAdminDb();
     return true;
 }
 
 export async function toggleAdmin(uid: string, isAdmin: boolean) {
     const isAdminUser = await verifyAdmin();
     if (!isAdminUser) throw new Error("Unauthorized");
+    const db = ensureAdminDb();
 
     try {
-        const userRef = adminDb!.collection('users').doc(uid);
+        const userRef = db.collection('users').doc(uid);
         await userRef.update({ isAdmin });
         revalidatePath('/admin/users');
         return { success: true };
@@ -32,9 +33,10 @@ export async function toggleAdmin(uid: string, isAdmin: boolean) {
 export async function togglePremium(uid: string, isPremium: boolean) {
     const isAdminUser = await verifyAdmin();
     if (!isAdminUser) throw new Error("Unauthorized");
+    const db = ensureAdminDb();
 
     try {
-        const userRef = adminDb!.collection('users').doc(uid);
+        const userRef = db.collection('users').doc(uid);
         await userRef.update({ isPremium });
         revalidatePath('/admin/users');
         return { success: true };
@@ -47,13 +49,14 @@ export async function togglePremium(uid: string, isPremium: boolean) {
 export async function updateUserCredits(uid: string, credits: number) {
     const isAdminUser = await verifyAdmin();
     if (!isAdminUser) throw new Error("Unauthorized");
+    const db = ensureAdminDb();
 
     if (credits < 0) {
         return { success: false, error: "Credits cannot be negative." };
     }
 
     try {
-        const userRef = adminDb!.collection('users').doc(uid);
+        const userRef = db.collection('users').doc(uid);
         await userRef.update({ credits });
         revalidatePath('/admin/users');
         return { success: true };
@@ -64,9 +67,9 @@ export async function updateUserCredits(uid: string, credits: number) {
 }
 
 export async function getAllUsers(): Promise<UserProfile[]> {
-  await ensureAdminDb();
+  const db = ensureAdminDb();
 
-  const usersSnapshot = await adminDb!.collection("users").orderBy("createdAt", "desc").get();
+  const usersSnapshot = await db.collection("users").orderBy("createdAt", "desc").get();
   const users: UserProfile[] = [];
   usersSnapshot.forEach((doc) => {
     const data = doc.data();
@@ -87,14 +90,14 @@ export async function getAllUsers(): Promise<UserProfile[]> {
 }
 
 export async function getTotalUserCount(): Promise<number> {
-    await ensureAdminDb();
-    const snapshot = await adminDb!.collection("users").get();
+    const db = ensureAdminDb();
+    const snapshot = await db.collection("users").get();
     return snapshot.size;
 }
 
 export async function getTotalLinkCount(): Promise<number> {
-    await ensureAdminDb();
-    const snapshot = await adminDb!.collection("links").get();
+    const db = ensureAdminDb();
+    const snapshot = await db.collection("links").get();
     return snapshot.size;
 }
 
@@ -111,13 +114,13 @@ async function getCountByDay(collectionName: string): Promise<{ date: string; co
         });
     }
 
-    await ensureAdminDb();
+    const db = ensureAdminDb();
     
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(today.getDate() - 6);
     sevenDaysAgo.setHours(0, 0, 0, 0);
 
-    const snapshot = await adminDb!.collection(collectionName).where('createdAt', '>=', sevenDaysAgo).get();
+    const snapshot = await db.collection(collectionName).where('createdAt', '>=', sevenDaysAgo).get();
     const countsByDay: { [key: string]: number } = {};
 
     snapshot.forEach(doc => {

@@ -17,23 +17,22 @@ export default function AdminUsersPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function getUsers() {
-        try {
-          const fetchedUsers = await getAllUsers();
-          // Ensure createdAt is a Date object for client-side sorting/filtering
-          const formattedUsers = fetchedUsers.map(u => ({
-            ...u,
-            createdAt: u.createdAt ? new Date(u.createdAt) : new Date(0),
-          })) as unknown as UserProfile[];
-          setUsers(formattedUsers);
-        } catch (error) {
-            console.error("Failed to fetch users", error);
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
     if (!authLoading && user?.isAdmin) {
+      async function getUsers() {
+          try {
+            const fetchedUsers = await getAllUsers();
+            // Ensure createdAt is a Date object for client-side sorting/filtering
+            const formattedUsers = fetchedUsers.map(u => ({
+              ...u,
+              createdAt: u.createdAt ? new Date(u.createdAt) : new Date(0),
+            })) as unknown as UserProfile[];
+            setUsers(formattedUsers);
+          } catch (error) {
+              console.error("Failed to fetch users", error);
+          } finally {
+              setIsLoading(false);
+          }
+      }
       getUsers();
     }
   }, [authLoading, user]);
