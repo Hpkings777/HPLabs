@@ -1,59 +1,76 @@
 
-"use server";
+"use client";
 
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
-import * as admin from "firebase-admin";
-
+import { redirect, useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Link as LinkIcon, LineChart } from "lucide-react";
-import { getTotalUserCount, getTotalLinkCount, getUserActivity, getLinkActivity } from "@/lib/firebase-admin";
+import { Users, Link as LinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { AdminCharts } from "./charts";
+import { useEffect, useState } from "react";
+import { getTotalUserCount, getTotalLinkCount, getUserActivity, getLinkActivity } from "@/lib/firebase-admin";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
+type ActivityData = {
+  date: string;
+  count: number;
+};
 
-async function getAdminStatus() {
-  const sessionCookie = cookies().get("session")?.value || "";
-  if (!sessionCookie) return false;
+export default function AdminPage() {
+  const { user, authLoading } = useAuth();
+  const router = useRouter();
+  const [userCount, setUserCount] = useState<number | null>(null);
+  const [linkCount, setLinkCount] = useState<number | null>(null);
+  const [userActivity, setUserActivity] = useState<ActivityData[] | null>(null);
+  const [linkActivity, setLinkActivity] = useState<ActivityData[] | null>(null);
 
-  try {
-    if (!admin.apps.length) {
-        const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string);
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount)
-        });
+  useEffect(() => {
+    if (!authLoading && user?.isAdmin) {
+      const fetchData = async () => {
+        const [uCount, lCount, uActivity, lActivity] = await Promise.all([
+          getTotalUserCount(),
+          getTotalLinkCount(),
+          getUserActivity(),
+          getLinkActivity(),
+        ]);
+        setUserCount(uCount);
+        setLinkCount(lCount);
+        const formattedUserActivity = uActivity.map(d => ({...d, date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}));
+        const formattedLinkActivity = lActivity.map(d => ({...d, date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}));
+        setUserActivity(formattedUserActivity);
+        setLinkActivity(formattedLinkActivity);
+      };
+      fetchData();
     }
-    const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
-    return decodedClaims.isAdmin === true;
-  } catch (error) {
-    return false;
+  }, [authLoading, user]);
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <LoadingSpinner />
+      </div>
+    );
   }
-}
 
-export default async function AdminPage() {
-  const isAdmin = await getAdminStatus();
-
-  if (!isAdmin) {
+  if (!user || !user.isAdmin) {
     redirect("/");
+    return null;
   }
 
-  const [userCount, linkCount, userActivity, linkActivity] = await Promise.all([
-    getTotalUserCount(),
-    getTotalLinkCount(),
-    getUserActivity(),
-    getLinkActivity(),
-  ]);
-  
-  const formattedUserActivity = userActivity.map(d => ({...d, date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}));
-  const formattedLinkActivity = linkActivity.map(d => ({...d, date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}));
+  const isLoadingData = userCount === null || linkCount === null || userActivity === null || linkActivity === null;
 
   return (
     <ToolLayout
       title="Admin Dashboard"
       description="Manage users and application settings."
     >
+      {isLoadingData ? (
+        <div className="flex justify-center items-center h-96">
+            <LoadingSpinner/>
+        </div>
+      ) : (
         <div className="space-y-8">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
@@ -90,8 +107,9 @@ export default async function AdminPage() {
                 </Card>
             </div>
 
-            <AdminCharts userActivity={formattedUserActivity} linkActivity={formattedLinkActivity} />
+            <AdminCharts userActivity={userActivity!} linkActivity={linkActivity!} />
         </div>
+      )}
     </ToolLayout>
   );
 }

@@ -135,7 +135,7 @@ export const columns: ColumnDef<UserProfile>[] = [
       );
     },
     cell: ({ row }) => {
-        const date = row.original.createdAt ? new Date(row.original.createdAt as unknown as string) : null;
+        const date = row.original.createdAt ? new Date(row.original.createdAt) : null;
         const formatted = date ? date.toLocaleDateString() : "N/A";
         return <div className="pl-4">{formatted}</div>
     }
