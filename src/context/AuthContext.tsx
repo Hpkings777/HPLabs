@@ -79,7 +79,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         const unsubProfile = onSnapshot(userDocRef, (doc) => {
            if (doc.exists()) {
-            setUser(doc.data() as UserProfile);
+            const userData = doc.data();
+            // Ensure isAdmin exists, default to false for older documents
+            if (userData.isAdmin === undefined) {
+              userData.isAdmin = false;
+            }
+            setUser(userData as UserProfile);
            } else {
              // This can happen if the user was deleted directly from Firebase console
              // or if document creation failed.
