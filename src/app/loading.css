@@ -231,13 +231,8 @@
   z-index: 1;
   height: 1.2rem; /* Reserve space */
   opacity: 0;
-  transition: opacity 0.3s;
+  animation: fadeIn 1s ease-in 1s forwards;
 }
-
-.loading-container:hover .loading-subtext {
-  opacity: 1;
-}
-
 
 .crack-effect {
   position: absolute;
