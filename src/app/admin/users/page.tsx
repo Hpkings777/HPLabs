@@ -1,26 +1,15 @@
 
 "use client";
 
-import "server-only";
-
 import { redirect } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { ToolLayout } from "@/components/ToolLayout";
-import { getAllUsers } from "@/lib/firebase-admin";
+import { getAllUsers } from "./actions";
 import { UserProfile } from "@/context/AuthContext";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { useEffect, useState } from "react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-
-async function getUsers(): Promise<UserProfile[]> {
-  const users = await getAllUsers();
-  // Ensure createdAt is a Date object for client-side sorting/filtering
-  return users.map(u => ({
-    ...u,
-    createdAt: u.createdAt ? new Date(u.createdAt) : new Date(0),
-  })) as unknown as UserProfile[];
-}
 
 export default function AdminUsersPage() {
   const { user, authLoading } = useAuth();
@@ -28,12 +17,24 @@ export default function AdminUsersPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    async function getUsers() {
+        try {
+          const fetchedUsers = await getAllUsers();
+          // Ensure createdAt is a Date object for client-side sorting/filtering
+          const formattedUsers = fetchedUsers.map(u => ({
+            ...u,
+            createdAt: u.createdAt ? new Date(u.createdAt) : new Date(0),
+          })) as unknown as UserProfile[];
+          setUsers(formattedUsers);
+        } catch (error) {
+            console.error("Failed to fetch users", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     if (!authLoading && user?.isAdmin) {
-      setIsLoading(true);
-      getUsers().then((fetchedUsers) => {
-        setUsers(fetchedUsers);
-        setIsLoading(false);
-      });
+      getUsers();
     }
   }, [authLoading, user]);
 

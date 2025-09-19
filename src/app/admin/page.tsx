@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { AdminCharts } from "./charts";
 import { useEffect, useState } from "react";
-import { getTotalUserCount, getTotalLinkCount, getUserActivity, getLinkActivity } from "@/lib/firebase-admin";
+import { getTotalUserCount, getTotalLinkCount, getUserActivity, getLinkActivity } from "@/app/admin/users/actions";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 type ActivityData = {
@@ -29,18 +29,22 @@ export default function AdminPage() {
   useEffect(() => {
     if (!authLoading && user?.isAdmin) {
       const fetchData = async () => {
-        const [uCount, lCount, uActivity, lActivity] = await Promise.all([
-          getTotalUserCount(),
-          getTotalLinkCount(),
-          getUserActivity(),
-          getLinkActivity(),
-        ]);
-        setUserCount(uCount);
-        setLinkCount(lCount);
-        const formattedUserActivity = uActivity.map(d => ({...d, date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}));
-        const formattedLinkActivity = lActivity.map(d => ({...d, date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}));
-        setUserActivity(formattedUserActivity);
-        setLinkActivity(formattedLinkActivity);
+        try {
+            const [uCount, lCount, uActivity, lActivity] = await Promise.all([
+            getTotalUserCount(),
+            getTotalLinkCount(),
+            getUserActivity(),
+            getLinkActivity(),
+            ]);
+            setUserCount(uCount);
+            setLinkCount(lCount);
+            const formattedUserActivity = uActivity.map(d => ({...d, date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}));
+            const formattedLinkActivity = lActivity.map(d => ({...d, date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}));
+            setUserActivity(formattedUserActivity);
+            setLinkActivity(formattedLinkActivity);
+        } catch (error) {
+            console.error("Failed to fetch admin data", error)
+        }
       };
       fetchData();
     }
