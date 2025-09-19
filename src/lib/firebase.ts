@@ -1,8 +1,8 @@
+
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import * as admin from 'firebase-admin';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -19,15 +19,4 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-if (typeof window === "undefined" && !admin.apps.length) {
-    const serviceAccount = JSON.parse(
-        process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string
-    );
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-    });
-}
-
-const adminDb = typeof window === "undefined" ? admin.firestore() : null;
-
-export { app, auth, db, adminDb };
+export { app, auth, db };

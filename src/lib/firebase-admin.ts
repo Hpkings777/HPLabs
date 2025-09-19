@@ -7,18 +7,22 @@ import { Link } from "lucide-react";
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
-  const serviceAccount = JSON.parse(
-    process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string
-  );
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+  try {
+    const serviceAccount = JSON.parse(
+      process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string
+    );
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+  } catch (error) {
+     console.error('Firebase Admin initialization error', error);
+  }
 }
 
-const db = admin.firestore();
+export const adminDb = admin.firestore();
 
 export async function getAllUsers(): Promise<UserProfile[]> {
-  const usersSnapshot = await db.collection("users").orderBy("createdAt", "desc").get();
+  const usersSnapshot = await adminDb.collection("users").orderBy("createdAt", "desc").get();
   const users: UserProfile[] = [];
   usersSnapshot.forEach((doc) => {
     const data = doc.data();
@@ -37,17 +41,17 @@ export async function getAllUsers(): Promise<UserProfile[]> {
 }
 
 export async function getTotalUserCount(): Promise<number> {
-    const snapshot = await db.collection("users").get();
+    const snapshot = await adminDb.collection("users").get();
     return snapshot.size;
 }
 
 export async function getTotalLinkCount(): Promise<number> {
-    const snapshot = await db.collection("links").get();
+    const snapshot = await adminDb.collection("links").get();
     return snapshot.size;
 }
 
 async function getCountByDay(collectionName: string): Promise<{ date: string; count: number }[]> {
-    const snapshot = await db.collection(collectionName).get();
+    const snapshot = await adminDb.collection(collectionName).get();
     const countsByDay: { [key: string]: number } = {};
 
     snapshot.forEach(doc => {

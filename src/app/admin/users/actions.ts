@@ -2,7 +2,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { adminDb } from "@/lib/firebase";
+import { adminDb } from "@/lib/firebase-admin";
 
 async function verifyAdmin() {
     // In a real app, you'd get the current user's session and verify they are an admin.
@@ -13,7 +13,7 @@ async function verifyAdmin() {
 
 export async function toggleAdmin(uid: string, isAdmin: boolean) {
     const isAdminUser = await verifyAdmin();
-    if (!isAdminUser || !adminDb) throw new Error("Unauthorized");
+    if (!isAdminUser) throw new Error("Unauthorized");
 
     try {
         const userRef = adminDb.collection('users').doc(uid);
@@ -28,7 +28,7 @@ export async function toggleAdmin(uid: string, isAdmin: boolean) {
 
 export async function togglePremium(uid: string, isPremium: boolean) {
     const isAdminUser = await verifyAdmin();
-    if (!isAdminUser || !adminDb) throw new Error("Unauthorized");
+    if (!isAdminUser) throw new Error("Unauthorized");
 
     try {
         const userRef = adminDb.collection('users').doc(uid);
@@ -43,7 +43,7 @@ export async function togglePremium(uid: string, isPremium: boolean) {
 
 export async function updateUserCredits(uid: string, credits: number) {
     const isAdminUser = await verifyAdmin();
-    if (!isAdminUser || !adminDb) throw new Error("Unauthorized");
+    if (!isAdminUser) throw new Error("Unauthorized");
 
     if (credits < 0) {
         return { success: false, error: "Credits cannot be negative." };
