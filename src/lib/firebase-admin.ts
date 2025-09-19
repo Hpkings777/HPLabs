@@ -7,22 +7,35 @@ import { Link } from "lucide-react";
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
-  try {
-    const serviceAccount = JSON.parse(
-      process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string
-    );
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
-  } catch (error) {
-     console.error('Firebase Admin initialization error', error);
+  const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+  if (serviceAccountKey) {
+    try {
+      const serviceAccount = JSON.parse(serviceAccountKey);
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+    } catch (error) {
+      console.error('Firebase Admin initialization error:', error);
+    }
+  } else {
+    console.warn("FIREBASE_SERVICE_ACCOUNT_KEY is not set. Admin features will be disabled.");
   }
 }
 
-export const adminDb = admin.firestore();
+export const adminDb = admin.apps.length ? admin.firestore() : null;
+
+async function ensureAdminDb() {
+    if (!adminDb) {
+        console.error("Firebase Admin is not initialized. Skipping admin operation.");
+        return false;
+    }
+    return true;
+}
 
 export async function getAllUsers(): Promise<UserProfile[]> {
-  const usersSnapshot = await adminDb.collection("users").orderBy("createdAt", "desc").get();
+  if (!await ensureAdminDb()) return [];
+
+  const usersSnapshot = await adminDb!.collection("users").orderBy("createdAt", "desc").get();
   const users: UserProfile[] = [];
   usersSnapshot.forEach((doc) => {
     const data = doc.data();
@@ -41,17 +54,33 @@ export async function getAllUsers(): Promise<UserProfile[]> {
 }
 
 export async function getTotalUserCount(): Promise<number> {
-    const snapshot = await adminDb.collection("users").get();
+    if (!await ensureAdminDb()) return 0;
+    const snapshot = await adminDb!.collection("users").get();
     return snapshot.size;
 }
 
 export async function getTotalLinkCount(): Promise<number> {
-    const snapshot = await adminDb.collection("links").get();
+    if (!await ensureAdminDb()) return 0;
+    const snapshot = await adminDb!.collection("links").get();
     return snapshot.size;
 }
 
 async function getCountByDay(collectionName: string): Promise<{ date: string; count: number }[]> {
-    const snapshot = await adminDb.collection(collectionName).get();
+    const today = new Date();
+    const result = [];
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        const dateString = date.toISOString().split('T')[0];
+        result.push({
+            date: dateString,
+            count: 0
+        });
+    }
+
+    if (!await ensureAdminDb()) return result;
+    
+    const snapshot = await adminDb!.collection(collectionName).get();
     const countsByDay: { [key: string]: number } = {};
 
     snapshot.forEach(doc => {
@@ -62,19 +91,10 @@ async function getCountByDay(collectionName: string): Promise<{ date: string; co
         }
     });
 
-    const today = new Date();
-    const result = [];
-    for (let i = 6; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-        const dateString = date.toISOString().split('T')[0];
-        result.push({
-            date: dateString,
-            count: countsByDay[dateString] || 0
-        });
-    }
-
-    return result;
+    return result.map(day => ({
+        ...day,
+        count: countsByDay[day.date] || 0,
+    }));
 }
 
 export async function getUserActivity() {

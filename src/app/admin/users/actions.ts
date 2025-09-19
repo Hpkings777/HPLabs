@@ -8,6 +8,10 @@ async function verifyAdmin() {
     // In a real app, you'd get the current user's session and verify they are an admin.
     // For this prototype, we'll assume the action is triggered by an authorized admin.
     // This is a critical security step for a production application.
+    if (!adminDb) {
+        console.error("Firebase Admin not initialized. Cannot perform admin action.");
+        return false;
+    }
     return true;
 }
 
@@ -16,7 +20,7 @@ export async function toggleAdmin(uid: string, isAdmin: boolean) {
     if (!isAdminUser) throw new Error("Unauthorized");
 
     try {
-        const userRef = adminDb.collection('users').doc(uid);
+        const userRef = adminDb!.collection('users').doc(uid);
         await userRef.update({ isAdmin });
         revalidatePath('/admin/users');
         return { success: true };
@@ -31,7 +35,7 @@ export async function togglePremium(uid: string, isPremium: boolean) {
     if (!isAdminUser) throw new Error("Unauthorized");
 
     try {
-        const userRef = adminDb.collection('users').doc(uid);
+        const userRef = adminDb!.collection('users').doc(uid);
         await userRef.update({ isPremium });
         revalidatePath('/admin/users');
         return { success: true };
@@ -50,7 +54,7 @@ export async function updateUserCredits(uid: string, credits: number) {
     }
 
     try {
-        const userRef = adminDb.collection('users').doc(uid);
+        const userRef = adminDb!.collection('users').doc(uid);
         await userRef.update({ credits });
         revalidatePath('/admin/users');
         return { success: true };
