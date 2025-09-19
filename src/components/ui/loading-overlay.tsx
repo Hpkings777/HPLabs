@@ -2,28 +2,17 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useLoading } from "@/context/LoadingContext";
 import { cn } from "@/lib/utils";
-
-const engagingTexts = [
-  "Reticulating splines...",
-  "Calibrating quantum flux...",
-  "Buffering neural network...",
-  "Polishing pixels...",
-  "Defragmenting reality...",
-  "Warming up the AI...",
-  "Unscrambling protons...",
-  "Generating witty loading text..."
-];
 
 export function LoadingOverlay() {
   const { isLoading, stopLoading } = useLoading();
   const [show, setShow] = useState(false);
   const [isTimedOut, setIsTimedOut] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
-  const [subtext, setSubtext] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleFinishLoading = useCallback(() => {
     setIsFadingOut(true);
@@ -41,29 +30,33 @@ export function LoadingOverlay() {
 
     if (isLoading) {
       setShow(true);
-
-      // Minimum 3s display
+      
+      // Minimum 3s display. Changed from 3s to 5s as per new req.
       minTimeId = setTimeout(() => {
         // If loading has already finished by the time the minimum display time is up, then hide it.
         if (!isLoading) {
           handleFinishLoading();
         }
-      }, 3000);
+      }, 5000);
 
-      // 8s timeout for failure state. Only triggers if still loading.
+      // 8s timeout for failure state.
       timeoutId = setTimeout(() => {
-        if (isLoading) { // Check if we are still in a loading state
+        // Only trigger failure if we are *still* loading.
+        if (isLoading) {
           setIsTimedOut(true);
-          // After showing timeout message, redirect
+          // After showing timeout message for 2s, redirect back.
           setTimeout(() => {
-            router.back();
+            // Check if still on the same page before going back
+            if (isLoading) {
+               router.back();
+            }
             handleFinishLoading();
           }, 2000);
         }
       }, 8000);
 
-    } else if(show) {
-       // If stopLoading() is called before 3s, wait for minTime to finish
+    } else if (show && !minTimeId) {
+       // This handles the case where stopLoading() is called before the min display time is up.
        // The logic inside the minTimeId timeout will handle the closing.
     }
 
@@ -72,17 +65,6 @@ export function LoadingOverlay() {
       if (minTimeId) clearTimeout(minTimeId);
     };
   }, [isLoading, show, handleFinishLoading, router]);
-
-  useEffect(() => {
-    if (show && !isTimedOut) {
-      const textInterval = setInterval(() => {
-        setSubtext(engagingTexts[Math.floor(Math.random() * engagingTexts.length)]);
-      }, 2000);
-      setSubtext(engagingTexts[Math.floor(Math.random() * engagingTexts.length)]);
-      return () => clearInterval(textInterval);
-    }
-  }, [show, isTimedOut]);
-
 
   if (!show) {
     return null;
@@ -100,10 +82,9 @@ export function LoadingOverlay() {
         </div>
       ) : (
         <div className="loading-container">
-          <div className="loading-rectangle"></div>
-          <div className="scan-bar"></div>
+          <div className="loading-card"></div>
           <div className="loading-text">HP Labs</div>
-          <div className="loading-subtext">{subtext}</div>
+          <div className="loading-subtext">Initializing protocol...</div>
         </div>
       )}
     </div>

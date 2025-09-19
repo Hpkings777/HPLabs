@@ -17,41 +17,68 @@
   }
 }
 
-@keyframes flicker {
-  0%, 18%, 22%, 25%, 53%, 57%, 100% {
-    text-shadow:
-      0 0 4px #fff,
-      0 0 11px #fff,
-      0 0 19px #fff,
-      0 0 40px #0fa,
-      0 0 80px #0fa,
-      0 0 90px #0fa,
-      0 0 100px #0fa,
-      0 0 150px #0fa;
+@keyframes text-glitch {
+  0%, 100% {
+    clip-path: inset(0 0 0 0);
   }
-  20%, 24%, 55% {
-    text-shadow: none;
+  5% {
+    clip-path: inset(0.8em 0 0.4em 0);
+  }
+  10% {
+    clip-path: inset(0.4em 0 0.8em 0);
+  }
+  15% {
+    clip-path: inset(0.2em 0 0.1em 0);
+  }
+  20% {
+    clip-path: inset(0.5em 0 0.2em 0);
+  }
+  25% {
+    clip-path: inset(0.3em 0 0.7em 0);
+  }
+  30%, 50%, 70% {
+    clip-path: inset(0 0 0 0);
+  }
+   80% {
+    transform: translateX(2px);
+    opacity: 0.8;
+  }
+  81% {
+    transform: translateX(-2px);
+    opacity: 1;
+  }
+  90% {
+    clip-path: inset(0.1em 0 0.9em 0);
+  }
+  95% {
+    clip-path: inset(0.9em 0 0.1em 0);
   }
 }
 
-@keyframes scan {
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-30deg);
+  }
+  100% {
+    transform: translateX(100%) skewX(-30deg);
+  }
+}
+
+@keyframes slide-bar-h {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slide-bar-v {
   0% {
     transform: translateY(-100%);
   }
   100% {
     transform: translateY(100%);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.02);
-  }
-  100% {
-    transform: scale(1);
   }
 }
 
@@ -70,16 +97,17 @@
   }
 }
 
+
 .loading-overlay {
   position: fixed;
   inset: 0;
-  background: radial-gradient(ellipse at center, rgba(10, 20, 30, 0.8) 0%, rgba(5, 10, 15, 0.95) 100%);
-  backdrop-filter: blur(4px);
+  background-color: hsla(231, 39%, 10%, 0.8);
+  backdrop-filter: blur(8px);
   z-index: 5000;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.4s ease-out;
 }
 
 .loading-overlay.fade-out {
@@ -88,67 +116,127 @@
 
 .loading-container {
   position: relative;
-  width: 350px;
-  height: 200px;
+  width: 400px;
+  height: 220px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  animation: pulse 4s infinite ease-in-out;
+  overflow: hidden;
 }
 
-.loading-rectangle {
+.loading-card {
   position: absolute;
   inset: 0;
-  border: 2px solid #0ff;
-  box-shadow:
-    0 0 5px #0ff,
-    0 0 15px #0ff,
-    inset 0 0 5px #0ff,
-    0 0 25px #f0f,
-    inset 0 0 25px #f0f;
-  border-radius: 8px;
-}
-
-.loading-text {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #fff;
-  animation: flicker 2s linear infinite;
-  z-index: 1;
-}
-
-.loading-subtext {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1rem;
-  color: #0ff;
-  margin-top: 0.5rem;
-  text-shadow: 0 0 5px #0fa;
-  z-index: 1;
-  height: 1.2rem; /* Reserve space */
-}
-
-.scan-bar {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 100%;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   overflow: hidden;
-  border-radius: 8px;
 }
 
-.scan-bar::before {
+/* Shimmer Effect */
+.loading-card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  height: 2px;
-  background: #0ff;
-  box-shadow: 0 0 5px #0ff;
-  animation: scan 1.5s linear infinite alternate;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 3s infinite linear;
 }
+
+
+/* Animated Gradient Bars */
+.loading-container::before,
+.loading-container::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  height: 4px;
+  width: 150%;
+  background: linear-gradient(90deg, transparent, #00ffff, transparent);
+  animation: slide-bar-h 4s infinite linear;
+}
+
+.loading-container::before {
+  top: 10px;
+  animation-delay: -2s;
+}
+
+.loading-container::after {
+  bottom: 10px;
+}
+
+.loading-card::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    width: 4px;
+    height: 150%;
+    background: linear-gradient(0deg, transparent, #8A2BE2, transparent);
+    animation: slide-bar-v 3.5s infinite linear;
+    left: 20px;
+    animation-delay: -1.75s;
+}
+
+
+.loading-text {
+  position: relative;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #fff;
+  z-index: 1;
+}
+
+/* Glitch Effect Setup */
+.loading-text::before,
+.loading-text::after {
+  content: 'HP Labs';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.loading-text::before {
+  left: 2px;
+  text-shadow: -2px 0 #8A2BE2; /* Deep Purple */
+  animation: text-glitch 4s infinite linear alternate-reverse;
+}
+
+.loading-text::after {
+  left: -2px;
+  text-shadow: -2px 0 #00ffff, 2px 2px #8A2BE2; /* Neon Cyan + Deep Purple */
+  animation: text-glitch 4s infinite linear alternate;
+}
+
+
+.loading-subtext {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  color: #00ffff;
+  margin-top: 0.5rem;
+  text-shadow: 0 0 5px #00ffff;
+  z-index: 1;
+  height: 1.2rem; /* Reserve space */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.loading-container:hover .loading-subtext {
+  opacity: 1;
+}
+
 
 .crack-effect {
   position: absolute;
@@ -156,7 +244,7 @@
   left: 50%;
   width: 200px;
   height: 200px;
-  background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 0 V100 M0 50 H100 M20 20 L80 80 M20 80 L80 20" stroke="rgba(255,255,255,0.8)" stroke-width="2" fill="none" transform="rotate(10 50 50)"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 0 V100 M0 50 H100 M20 20 L80 80 M20 80 L80 20" stroke="rgba(0, 255, 255, 0.8)" stroke-width="1" fill="none" transform="rotate(10 50 50)"/></svg>');
   background-size: cover;
   animation: crack 0.5s ease-out forwards;
   z-index: 10;
