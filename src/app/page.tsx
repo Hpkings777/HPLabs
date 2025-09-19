@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -8,12 +9,16 @@ import { Input } from "@/components/ui/input";
 import { tools, categories, type Tool, type ToolCategory } from "@/lib/tools";
 import { Search, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebounce(search, 300);
+  const { user } = useAuth();
 
-  const filteredTools = tools.filter(
+  const availableTools = tools.filter(tool => !tool.isAdmin || (user?.isAdmin));
+
+  const filteredTools = availableTools.filter(
     (tool) =>
       tool.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
       tool.description.toLowerCase().includes(debouncedSearch.toLowerCase()) ||

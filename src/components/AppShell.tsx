@@ -184,9 +184,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user } = useAuth();
 
+  const availableTools = tools.filter(tool => !tool.isAdmin || (user?.isAdmin));
+
   const toolsByCategory = categories.map((category) => ({
     category,
-    tools: tools.filter((tool) => tool.category === category),
+    tools: availableTools.filter((tool) => tool.category === category),
   })).filter(c => c.tools.length > 0);
 
   const isAuthPage = pathname === '/login' || pathname === '/signup';

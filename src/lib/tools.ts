@@ -13,9 +13,10 @@ import {
   Wand2,
   Sparkles,
   Shield,
+  Link as LinkIcon,
 } from "lucide-react";
 
-export type ToolCategory = "Admin" | "AI" | "Security" | "Developer" | "Utility" | "Premium";
+export type ToolCategory = "AI" | "Security" | "Developer" | "Utility" | "Premium";
 
 export interface Tool {
   title: string;
@@ -33,7 +34,7 @@ export const tools: Tool[] = [
     description: "Manage users and application settings.",
     href: "/admin",
     icon: Shield,
-    category: "Admin",
+    category: "Developer",
     isAdmin: true,
   },
   {
@@ -52,6 +53,13 @@ export const tools: Tool[] = [
     href: "/phorix",
     icon: Wand2,
     category: "AI",
+  },
+  {
+    title: "URL Shortener",
+    description: "Create short, shareable links from long URLs.",
+    href: "/url-shortener",
+    icon: LinkIcon,
+    category: "Utility",
   },
   {
     title: "Base64 Tool",
@@ -122,4 +130,4 @@ export const bottomNav: NavLink[] = [
     }
 ]
 
-export const categories: ToolCategory[] = ["Admin", "Premium", "AI", "Developer", "Security", "Utility"];
+export const categories: ToolCategory[] = ["Premium", "AI", "Developer", "Security", "Utility"];
