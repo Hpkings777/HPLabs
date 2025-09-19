@@ -4,7 +4,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { GanttChartSquare, User, Sparkles, Coins, Shield } from "lucide-react";
+import { GanttChartSquare, User, Sparkles, Coins, Shield, Users } from "lucide-react";
 import {
   mainNav,
   bottomNav,
@@ -124,7 +124,7 @@ function UserNav() {
           <Link href="/login">Log In</Link>
         </Button>
         <Button asChild size="sm">
-          <Link href="/signup">Sign Up</Link>
+           <Link href="/signup">Sign Up</Link>
         </Button>
       </div>
     );
@@ -199,13 +199,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     category,
     tools: availableTools.filter((tool) => tool.category === category),
   })).filter(c => c.tools.length > 0);
-
+  
   const isAuthPage = pathname === '/login' || pathname === '/signup';
 
   if (isInitialLoad) {
     return <InitialLoader />;
   }
-
+  
   if (isAuthPage) {
     return <>{children}</>;
   }
@@ -232,6 +232,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <NavItem key={link.href} link={link} pathname={pathname} />
               ))}
               <SidebarSeparator />
+              {user?.isAdmin && pathname.startsWith('/admin') && (
+                <SidebarGroup>
+                    <SidebarGroupLabel className="flex items-center">
+                        Admin
+                    </SidebarGroupLabel>
+                    <SidebarMenuItem>
+                        <Link href="/admin" passHref>
+                            <SidebarMenuButton asChild isActive={pathname === '/admin'} tooltip="Dashboard">
+                                <div><Shield /><span>Dashboard</span></div>
+                            </SidebarMenuButton>
+                        </Link>
+                    </SidebarMenuItem>
+                     <SidebarMenuItem>
+                        <Link href="/admin/users" passHref>
+                            <SidebarMenuButton asChild isActive={pathname === '/admin/users'} tooltip="Users">
+                                <div><Users /><span>Users</span></div>
+                            </SidebarMenuButton>
+                        </Link>
+                    </SidebarMenuItem>
+                </SidebarGroup>
+              )}
+
               {toolsByCategory.map(({ category, tools }) => (
                 <SidebarGroup key={category}>
                   <SidebarGroupLabel className="flex items-center">

@@ -14,6 +14,7 @@ import {
   Sparkles,
   Shield,
   Link as LinkIcon,
+  Users,
 } from "lucide-react";
 
 export type ToolCategory = "AI" | "Security" | "Developer" | "Utility" | "Premium";
@@ -29,14 +30,6 @@ export interface Tool {
 }
 
 export const tools: Tool[] = [
-  {
-    title: "Admin Panel",
-    description: "Manage users and application settings.",
-    href: "/admin",
-    icon: Shield,
-    category: "Developer",
-    isAdmin: true,
-  },
   {
     title: "AI Workbench",
     description:
@@ -103,6 +96,25 @@ export const tools: Tool[] = [
     icon: Hash,
     category: "Security",
   },
+];
+
+export const adminTools: Tool[] = [
+    {
+        title: "Dashboard",
+        description: "Overview of application metrics.",
+        href: "/admin",
+        icon: Shield,
+        category: "Developer",
+        isAdmin: true,
+    },
+    {
+        title: "User Management",
+        description: "Manage all users in the application.",
+        href: "/admin/users",
+        icon: Users,
+        category: "Developer",
+        isAdmin: true,
+    }
 ];
 
 export interface NavLink {
