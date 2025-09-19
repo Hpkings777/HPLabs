@@ -14,6 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useActions, useStreamableValue } from 'genkit/next';
+import { phorixFlow } from '@/ai/flows/phorix-flow';
 
 type Message = {
   role: "user" | "assistant";
@@ -25,6 +27,8 @@ export default function PhorixPage() {
   const router = useRouter();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const { phorixFlow: runPhorixFlow } = useActions<typeof phorixFlow>();
+  const [stream, setStream] = useStreamableValue();
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -38,26 +42,35 @@ export default function PhorixPage() {
             }
         }, 100);
     }
-  }, [messages]);
+  }, [messages, stream]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput("");
     setIsLoading(true);
 
-    // Placeholder for AI response
-    setTimeout(() => {
-      const aiResponse: Message = {
-        role: "assistant",
-        content: "This is a placeholder response from Phorix.",
-      };
-      setMessages((prev) => [...prev, aiResponse]);
+    try {
+      const responseStream = await runPhorixFlow({ messages: newMessages });
+      setStream(responseStream);
+      
+      let finalResponse = '';
+      for await (const value of responseStream) {
+        finalResponse = value;
+      }
+      
+      setMessages(prev => [...prev, { role: 'assistant', content: finalResponse }]);
+    } catch (error) {
+      console.error("Error running Phorix flow", error);
+      setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I seem to be having trouble connecting. Please try again."}]);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+      setStream(undefined);
+    }
   };
 
   if (authLoading) {
@@ -101,7 +114,7 @@ export default function PhorixPage() {
         <CardContent className="p-6 flex-1 flex flex-col gap-4">
           <ScrollArea className="flex-1 pr-4 -mr-4" ref={scrollAreaRef}>
             <div className="space-y-6">
-              {messages.length === 0 ? (
+              {messages.length === 0 && !stream ? (
                 <div className="text-center text-muted-foreground pt-16">
                   <Sparkles className="w-12 h-12 mx-auto mb-4" />
                   <p className="text-lg">Welcome to Phorix</p>
@@ -144,17 +157,15 @@ export default function PhorixPage() {
                   </div>
                 ))
               )}
-               {isLoading && (
+               {stream && (
                  <div className="flex items-start gap-4">
                     <Avatar className="w-9 h-9 border">
                         <div className="w-full h-full flex items-center justify-center bg-primary text-primary-foreground">
                             <Sparkles className="w-5 h-5" />
                         </div>
                     </Avatar>
-                    <div className="bg-muted rounded-2xl p-4 rounded-bl-none flex items-center space-x-2">
-                        <span className="h-2 w-2 bg-foreground/50 rounded-full animate-pulse [animation-delay:-0.3s]"></span>
-                        <span className="h-2 w-2 bg-foreground/50 rounded-full animate-pulse [animation-delay:-0.15s]"></span>
-                        <span className="h-2 w-2 bg-foreground/50 rounded-full animate-pulse"></span>
+                    <div className="bg-muted rounded-2xl p-4 rounded-bl-none max-w-[75%] text-sm whitespace-pre-wrap">
+                      {stream}
                     </div>
                  </div>
                 )}
@@ -185,7 +196,7 @@ export default function PhorixPage() {
               className="absolute right-1 bottom-1 h-9 w-16 rounded-lg"
               disabled={isLoading || !input.trim()}
             >
-              <Send className="w-5 h-5" />
+              {isLoading ? <LoadingSpinner /> : <Send className="w-5 h-5" />}
             </Button>
           </form>
         </CardContent>
