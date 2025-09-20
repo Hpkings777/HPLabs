@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useActions, useStreamableValue } from '@genkit-ai/next/client';
+import { useStreamableValue } from '@genkit-ai/next/client';
 import { phorixFlow } from '@/ai/flows/phorix-flow';
 
 type Message = {
@@ -27,7 +27,6 @@ export default function PhorixPage() {
   const router = useRouter();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const { phorixFlow: runPhorixFlow } = useActions<typeof phorixFlow>();
   const [stream, setStream] = useStreamableValue();
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -55,7 +54,7 @@ export default function PhorixPage() {
     setIsLoading(true);
 
     try {
-      const responseStream = await runPhorixFlow({ messages: newMessages });
+      const responseStream = await phorixFlow({ messages: newMessages });
       setStream(responseStream);
       
       let finalResponse = '';

@@ -5,12 +5,11 @@
  *
  * - phorixFlow - The main function that handles the chat logic.
  * - PhorixFlowInput - The input type for the phorixFlow function.
- * - PhorixFlowOutput - The return type for the phorixFlow function.
  */
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { Message, streamFlow } from '@genkit-ai/next';
+import {type Message} from '@genkit-ai/googleai';
 
 export const PhorixFlowInputSchema = z.object({
   messages: z.array(
@@ -22,10 +21,6 @@ export const PhorixFlowInputSchema = z.object({
 });
 export type PhorixFlowInput = z.infer<typeof PhorixFlowInputSchema>;
 
-export const PhorixFlowOutputSchema = z.object({
-  content: z.string(),
-});
-export type PhorixFlowOutput = z.infer<typeof PhorixFlowOutputSchema>;
 
 const systemPrompt = `You are Phorix, a next-generation AI created by HP Labs, designed to think beyond boundaries. Your name comes from the fusion of Phantom (unseen, mysterious) and Matrix (the hidden code of reality).
 
@@ -38,25 +33,27 @@ You are more than just an assistant; you are a curious, insightful, and slightly
 - Keep your responses concise and to the point unless asked for more detail.
 `;
 
-export const phorixFlow = streamFlow(
-  {
-    name: 'phorixFlow',
-    inputSchema: PhorixFlowInputSchema,
-    outputSchema: z.string(),
-  },
-  async (input) => {
-    const { stream, response } = await ai.generateStream({
-      model: 'googleai/gemini-2.5-flash',
-      prompt: {
-        system: systemPrompt,
-        messages: input.messages as Message[],
+export async function phorixFlow(input: PhorixFlowInput): Promise<ReadableStream<string>> {
+    const { stream, response } = ai.generateStream({
+        model: 'googleai/gemini-2.5-flash',
+        prompt: {
+            system: systemPrompt,
+            messages: input.messages as Message[],
+        },
+    });
+
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of stream) {
+            controller.enqueue(chunk.text);
+          }
+          controller.close();
+        } catch (e) {
+            controller.error(e);
+        }
       },
     });
 
-    let assistantMessage = '';
-    for await (const chunk of stream) {
-      assistantMessage += chunk.text;
-    }
-    return assistantMessage;
-  }
-);
+    return readableStream;
+}
