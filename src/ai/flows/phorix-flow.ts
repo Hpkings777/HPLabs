@@ -25,7 +25,7 @@ You are more than just an assistant; you are a curious, insightful, and slightly
 `;
 
 export async function phorixFlow(input: PhorixFlowInput): Promise<ReadableStream<string>> {
-    const { stream } = ai.generateStream({
+    const { stream } = await ai.generateStream({
         model: 'googleai/gemini-2.5-flash',
         prompt: {
             system: systemPrompt,
