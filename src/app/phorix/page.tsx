@@ -14,7 +14,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useStreamableValue } from '@genkit-ai/next/client';
 import { phorixFlow } from '@/ai/flows/phorix-flow';
 
 type Message = {
@@ -27,7 +26,7 @@ export default function PhorixPage() {
   const router = useRouter();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [stream, setStream] = useStreamableValue();
+  const [streamingMessage, setStreamingMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -41,7 +40,7 @@ export default function PhorixPage() {
             }
         }, 100);
     }
-  }, [messages, stream]);
+  }, [messages, streamingMessage]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -52,23 +51,31 @@ export default function PhorixPage() {
     setMessages(newMessages);
     setInput("");
     setIsLoading(true);
+    setStreamingMessage("");
 
     try {
       const responseStream = await phorixFlow({ messages: newMessages });
-      setStream(responseStream);
-      
-      let finalResponse = '';
-      for await (const value of responseStream) {
-        finalResponse = value;
+      const reader = responseStream.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedResponse = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) {
+          break;
+        }
+        const chunk = decoder.decode(value, { stream: true });
+        accumulatedResponse += chunk;
+        setStreamingMessage(accumulatedResponse);
       }
       
-      setMessages(prev => [...prev, { role: 'assistant', content: finalResponse }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: accumulatedResponse }]);
     } catch (error) {
       console.error("Error running Phorix flow", error);
       setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I seem to be having trouble connecting. Please try again."}]);
     } finally {
       setIsLoading(false);
-      setStream(undefined);
+      setStreamingMessage(null);
     }
   };
 
@@ -113,7 +120,7 @@ export default function PhorixPage() {
         <CardContent className="p-6 flex-1 flex flex-col gap-4">
           <ScrollArea className="flex-1 pr-4 -mr-4" ref={scrollAreaRef}>
             <div className="space-y-6">
-              {messages.length === 0 && !stream ? (
+              {messages.length === 0 && streamingMessage === null ? (
                 <div className="text-center text-muted-foreground pt-16">
                   <Sparkles className="w-12 h-12 mx-auto mb-4" />
                   <p className="text-lg">Welcome to Phorix</p>
@@ -156,7 +163,7 @@ export default function PhorixPage() {
                   </div>
                 ))
               )}
-               {stream && (
+               {streamingMessage !== null && (
                  <div className="flex items-start gap-4">
                     <Avatar className="w-9 h-9 border">
                         <div className="w-full h-full flex items-center justify-center bg-primary text-primary-foreground">
@@ -164,7 +171,8 @@ export default function PhorixPage() {
                         </div>
                     </Avatar>
                     <div className="bg-muted rounded-2xl p-4 rounded-bl-none max-w-[75%] text-sm whitespace-pre-wrap">
-                      {stream}
+                      {streamingMessage}
+                       {isLoading && <span className="inline-block w-2 h-4 bg-foreground animate-pulse ml-1" />}
                     </div>
                  </div>
                 )}
