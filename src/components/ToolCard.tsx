@@ -47,7 +47,7 @@ export function ToolCard({ title, description, href, icon: Icon, isPremium }: To
       )}>
         <CardHeader>
           <div className={cn(
-            "rounded-lg p-3 w-fit mb-4 transition-colors duration-300",
+            "rounded-full p-3 w-fit mb-4 transition-colors duration-300",
             isPremium
               ? "bg-yellow-400/10 text-yellow-500 group-hover:bg-yellow-400 group-hover:text-yellow-950"
               : "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground"
