@@ -53,7 +53,7 @@ export function ToolCard({ title, description, href, icon: Icon, isPremium }: To
               : "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground"
           )}>
             {isPhorix ? (
-              <Image src="/images/phorix-icon.png" alt="Phorix Logo" width={32} height={32} className="w-8 h-8" />
+              <Image src="/images/phorix-icon.png" alt="Phorix Logo" width={32} height={32} className="w-8 h-8 rounded-full" />
             ) : (
               <Icon className="w-8 h-8" />
             )}
