@@ -19,7 +19,7 @@ export async function phorixFlow(input: PhorixFlowInput): Promise<ReadableStream
     const { stream } = await ai.generateStream({
         model: 'googleai/gemini-2.5-flash',
         system: systemPromptContent,
-        prompt: input.messages,
+        prompt: input.messages.map(m => ({role: m.role, content: [{text: m.content}]})),
     });
 
     const readableStream = new ReadableStream({
