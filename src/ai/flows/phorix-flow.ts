@@ -18,12 +18,10 @@ const systemPromptContent = "You are Phorix, a next-generation AI from HP Labs, 
 export async function phorixFlow(input: PhorixFlowInput): Promise<ReadableStream<string>> {
     const { stream } = await ai.generateStream({
         model: 'googleai/gemini-2.5-flash',
-        prompt: {
-            messages: [
-                { role: 'system', content: systemPromptContent },
-                ...input.messages,
-            ],
-        },
+        prompt: [
+            { role: 'system', content: systemPromptContent },
+            ...input.messages,
+        ],
     });
 
     const readableStream = new ReadableStream({
