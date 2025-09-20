@@ -10,12 +10,12 @@ import {
   Cog,
   Home,
   User,
-  Wand2,
   Sparkles,
   Shield,
   Link as LinkIcon,
   Users,
 } from "lucide-react";
+import { PhorixIcon } from "@/components/PhorixIcon";
 
 export type ToolCategory = "AI" | "Security" | "Developer" | "Utility" | "Premium";
 
@@ -23,7 +23,7 @@ export interface Tool {
   title: string;
   description: string;
   href: string;
-  icon: LucideIcon;
+  icon: LucideIcon | React.ComponentType<{ className?: string }>;
   category: ToolCategory;
   isPremium?: boolean;
   isAdmin?: boolean;
@@ -44,7 +44,7 @@ export const tools: Tool[] = [
     description:
       "Phorix is the next-generation AI created by HP Labs, designed to think beyond boundaries. Its name comes from the fusion of Phantom (unseen, mysterious) and Matrix (the hidden code of reality).",
     href: "/phorix",
-    icon: Wand2,
+    icon: PhorixIcon,
     category: "AI",
   },
   {
