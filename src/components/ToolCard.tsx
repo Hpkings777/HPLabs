@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   Card,
   CardHeader,
@@ -34,6 +35,8 @@ export function ToolCard({ title, description, href, icon: Icon, isPremium }: To
     }
   };
 
+  const isPhorix = title === "Phorix";
+
   return (
     <Link href={href} className="group block h-full" onClick={handleClick}>
       <Card className={cn(
@@ -49,7 +52,11 @@ export function ToolCard({ title, description, href, icon: Icon, isPremium }: To
               ? "bg-yellow-400/10 text-yellow-500 group-hover:bg-yellow-400 group-hover:text-yellow-950"
               : "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground"
           )}>
-            <Icon className="w-8 h-8" />
+            {isPhorix ? (
+              <Image src="/phorix-logo.png" alt="Phorix Logo" width={32} height={32} className="w-8 h-8" />
+            ) : (
+              <Icon className="w-8 h-8" />
+            )}
           </div>
           <CardTitle className="text-xl font-headline flex items-center justify-between">
             {title}

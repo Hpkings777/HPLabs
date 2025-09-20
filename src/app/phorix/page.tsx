@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { phorixFlow } from '@/ai/flows/phorix-flow';
-import { PhorixIcon } from "@/components/PhorixIcon";
 
 type Message = {
   role: "user" | "assistant";
@@ -123,7 +123,7 @@ export default function PhorixPage() {
             <div className="space-y-6">
               {messages.length === 0 && streamingMessage === null ? (
                 <div className="text-center text-muted-foreground pt-16">
-                  <PhorixIcon className="w-16 h-16 mx-auto mb-4" />
+                  <Image src="/phorix-logo.png" alt="Phorix Logo" width={64} height={64} className="w-16 h-16 mx-auto mb-4" />
                   <p className="text-lg">Welcome to Phorix</p>
                   <p>Start a conversation by typing your message below.</p>
                 </div>
@@ -137,8 +137,8 @@ export default function PhorixPage() {
                     )}
                   >
                     {message.role === "assistant" && (
-                       <Avatar className="w-9 h-9 border p-1">
-                        <PhorixIcon />
+                       <Avatar className="w-9 h-9 border p-1 bg-white">
+                        <Image src="/phorix-logo.png" alt="Phorix Logo" width={36} height={36} />
                       </Avatar>
                     )}
                     <div
@@ -164,8 +164,8 @@ export default function PhorixPage() {
               )}
                {streamingMessage !== null && (
                  <div className="flex items-start gap-4">
-                    <Avatar className="w-9 h-9 border p-1">
-                        <PhorixIcon />
+                    <Avatar className="w-9 h-9 border p-1 bg-white">
+                      <Image src="/phorix-logo.png" alt="Phorix Logo" width={36} height={36} />
                     </Avatar>
                     <div className="bg-muted rounded-2xl p-4 rounded-bl-none max-w-[75%] text-sm whitespace-pre-wrap">
                       {streamingMessage}
