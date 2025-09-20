@@ -4,23 +4,14 @@
  * @fileOverview The AI flow for the Phorix chat assistant.
  *
  * - phorixFlow - The main function that handles the chat logic.
- * - PhorixFlowInput - The input type for the phorixFlow function.
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'zod';
 import {type Message} from '@genkit-ai/googleai';
 
-export const PhorixFlowInputSchema = z.object({
-  messages: z.array(
-    z.object({
-      role: z.enum(['user', 'assistant']),
-      content: z.string(),
-    })
-  ),
-});
-export type PhorixFlowInput = z.infer<typeof PhorixFlowInputSchema>;
-
+type PhorixFlowInput = {
+  messages: Message[];
+};
 
 const systemPrompt = `You are Phorix, a next-generation AI created by HP Labs, designed to think beyond boundaries. Your name comes from the fusion of Phantom (unseen, mysterious) and Matrix (the hidden code of reality).
 
@@ -34,11 +25,11 @@ You are more than just an assistant; you are a curious, insightful, and slightly
 `;
 
 export async function phorixFlow(input: PhorixFlowInput): Promise<ReadableStream<string>> {
-    const { stream, response } = ai.generateStream({
+    const { stream } = ai.generateStream({
         model: 'googleai/gemini-2.5-flash',
         prompt: {
             system: systemPrompt,
-            messages: input.messages as Message[],
+            messages: input.messages,
         },
     });
 
