@@ -1,7 +1,6 @@
 
 import {NextRequest, NextResponse} from 'next/server';
-import {doc, getDoc} from 'firebase/firestore';
-import {db} from '@/lib/firebase';
+import { ensureAdminDb } from '@/lib/firebase-admin';
 
 export async function GET(
   req: NextRequest,
@@ -14,11 +13,12 @@ export async function GET(
   }
 
   try {
-    const linkDocRef = doc(db, 'links', shortId);
-    const docSnap = await getDoc(linkDocRef);
+    const db = ensureAdminDb();
+    const linkDocRef = db.collection('links').doc(shortId);
+    const docSnap = await linkDocRef.get();
 
-    if (docSnap.exists()) {
-      const {longUrl} = docSnap.data();
+    if (docSnap.exists) {
+      const {longUrl} = docSnap.data()!;
       return NextResponse.redirect(longUrl);
     } else {
       // Not found, redirect to home page
